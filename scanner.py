@@ -13,8 +13,27 @@ reserved = {
     'ones': 'ONES',
     'print': 'PRINT'
 }
-literals = ['+', '-', '/', '*', '(', ')', '[', ']', '{', '}']
-tokens = ['ID', 'INTNUM'] + list(reserved.values())
+literals = ['+', '-', '/', '*', '=', '(', ')', '[', ']', '{', '}', '\'', ':', ';', ',']
+tokens = ['DOTADD', 'DOTSUB', 'DOTMUL', 'DOTDIV',
+          'ADDASSIGN', 'SUBASSIGN', 'MULASSIGN', 'DIVASSIGN',
+          'EQ', 'LT', 'GT', 'LTE', 'GTE', 'DIFF',
+          'ID', 'INTNUM'] + list(reserved.values()) # todo 'FLOAT' ??
+
+t_DOTADD = r'.\+'
+t_DOTSUB = r'.-'
+t_DOTMUL = r'.\*'
+t_DOTDIV = r'./'
+t_ADDASSIGN = r'\+='
+t_SUBASSIGN = r'-='
+t_MULASSIGN = r'\*='
+t_DIVASSIGN = r'/='
+t_EQ = r'=='
+t_LT = r'<'
+t_GT = r'>'
+t_LTE = r'<='
+t_GTE = r'>='
+t_DIFF = r'!='
+
 
 def t_INTNUM(t):
     r'\d+'
@@ -23,6 +42,7 @@ def t_INTNUM(t):
 
 def t_ID(t):
     r'[a-zA-Z_]\w*'
+    t.type = reserved.get(t.value, 'ID')
     return t
 
 t_ignore = '  \t'
