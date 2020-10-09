@@ -48,7 +48,7 @@ def t_ID(t):
     t.type = reserved.get(t.value, 'ID')
     return t
 
-t_ignore = '  \t'
+t_ignore = '  \t' # todo ignore comments # ...
 
 def t_newline(t):
     r'\n+'
