@@ -17,7 +17,7 @@ literals = ['+', '-', '/', '*', '=', '(', ')', '[', ']', '{', '}', '\'', ':', ';
 tokens = ['DOTADD', 'DOTSUB', 'DOTMUL', 'DOTDIV',
           'ADDASSIGN', 'SUBASSIGN', 'MULASSIGN', 'DIVASSIGN',
           'EQ', 'LT', 'GT', 'LTE', 'GTE', 'DIFF',
-          'ID', 'INTNUM'] + list(reserved.values()) # todo 'FLOAT' ??
+          'ID',  'INTNUM', 'FLOAT'] + list(reserved.values())
 
 t_DOTADD = r'.\+'
 t_DOTSUB = r'.-'
@@ -34,6 +34,9 @@ t_LTE = r'<='
 t_GTE = r'>='
 t_DIFF = r'!='
 
+def t_FLOAT(t):
+    r'\d+\.\d*([eE][+-]?\d+)?'
+    return t
 
 def t_INTNUM(t):
     r'\d+'
@@ -52,7 +55,7 @@ def t_newline(t):
     t.lexer.lineno += len(t.value)
 
 def t_error(t) :
-    print("Illegal character '%s'" %t.value[0])
+    print(f"line ({t.lineno}): Illegal character '{t.value[0]}'" )
     t.lexer.skip(1)
 
 lexer = lex.lex()
