@@ -17,7 +17,7 @@ literals = ['+', '-', '/', '*', '=', '(', ')', '[', ']', '{', '}', '\'', ':', ';
 tokens = ['DOTADD', 'DOTSUB', 'DOTMUL', 'DOTDIV',
           'ADDASSIGN', 'SUBASSIGN', 'MULASSIGN', 'DIVASSIGN',
           'EQ', 'LT', 'GT', 'LTE', 'GTE', 'DIFF',
-          'ID',  'INTNUM', 'FLOAT'] + list(reserved.values())
+          'ID', 'INTNUM', 'FLOAT'] + list(reserved.values())
 
 t_DOTADD = r'.\+'
 t_DOTSUB = r'.-'
@@ -33,29 +33,40 @@ t_GT = r'>'
 t_LTE = r'<='
 t_GTE = r'>='
 t_DIFF = r'!='
+t_ignore = ' \t'
+
+
+def t_COMMENT(t):
+    r'\#[^\n]*'
+    t.lexer.lineno += 1
+    pass
+
 
 def t_FLOAT(t):
     r'\d+\.\d*([eE][+-]?\d+)?'
     return t
+
 
 def t_INTNUM(t):
     r'\d+'
     t.value = int(t.value)
     return t
 
+
 def t_ID(t):
     r'[a-zA-Z_]\w*'
     t.type = reserved.get(t.value, 'ID')
     return t
 
-t_ignore = '  \t' # todo ignore comments # ...
 
 def t_newline(t):
     r'\n+'
     t.lexer.lineno += len(t.value)
 
-def t_error(t) :
-    print(f"line ({t.lineno}): Illegal character '{t.value[0]}'" )
+
+def t_error(t):
+    print(f"line ({t.lineno}): Illegal character '{t.value[0]}'")
     t.lexer.skip(1)
+
 
 lexer = lex.lex()
