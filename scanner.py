@@ -38,8 +38,6 @@ t_ignore = ' \t'
 
 def t_COMMENT(t):
     r'\#[^\n]*'
-    t.lexer.lineno += 1
-    pass
 
 
 def t_FLOAT(t):
@@ -61,7 +59,8 @@ def t_ID(t):
 
 def t_newline(t):
     r'\n+'
-    t.lexer.lineno += len(t.value)
+    t.lexer.lineno += 1
+    pass
 
 
 def t_error(t):
