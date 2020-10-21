@@ -17,7 +17,7 @@ literals = ['+', '-', '/', '*', '=', '(', ')', '[', ']', '{', '}', '\'', ':', ';
 tokens = ['DOTADD', 'DOTSUB', 'DOTMUL', 'DOTDIV',
           'ADDASSIGN', 'SUBASSIGN', 'MULASSIGN', 'DIVASSIGN',
           'EQ', 'LT', 'GT', 'LTE', 'GTE', 'DIFF',
-          'ID', 'INTNUM', 'FLOAT'] + list(reserved.values())
+          'STR', 'ID', 'INTNUM', 'FLOAT'] + list(reserved.values())
 
 t_DOTADD = r'.\+'
 t_DOTSUB = r'.-'
@@ -41,7 +41,7 @@ def t_COMMENT(t):
 
 
 def t_FLOAT(t):
-    r'\d+\.\d*([eE][+-]?\d+)?'
+    r'\d*\.\d*([eE][+-]?\d+)?'
     return t
 
 
@@ -50,6 +50,9 @@ def t_INTNUM(t):
     t.value = int(t.value)
     return t
 
+def t_STR(t):
+    r'"([^"]*)"'
+    return t
 
 def t_ID(t):
     r'[a-zA-Z_]\w*'
@@ -59,8 +62,7 @@ def t_ID(t):
 
 def t_newline(t):
     r'\n+'
-    t.lexer.lineno += 1
-    pass
+    t.lexer.lineno += len(t.value)
 
 
 def t_error(t):
