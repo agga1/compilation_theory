@@ -1,10 +1,20 @@
 # object oriented version
 
 import sys
-
 import scanner  # scanner.py is a file you create, (it is not an external library)
-
 if __name__ == '__main__':
+    console = True
+    # ------from console
+    if console:
+        lexer = scanner.lexer
+        s = input('scanner >')
+        while(s != 'q'):
+            lexer.input(s)
+            for token in lexer:
+                print("%d: %s(%s)" %(token.lineno, token.type, token.value))
+            s = input('scanner >')
+
+    # -------from file
     try:
         filename = sys.argv[1] if len(sys.argv) > 1 else "example.txt"
         file = open(filename, "r")
