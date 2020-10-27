@@ -87,13 +87,16 @@ names = { }
 
 # statement
 def p_statement_assign(p):
-    """statement : ID '=' expression
-       statement : ID '=' list"""
+    """statement : ID '=' expression"""
     names[p[1]] = p[3]
 
 def p_statement_expr(p):
     'statement : expression'
     print(p[1])
+
+def p_expression_print(p):
+    'statement : PRINT expression'
+    print(p[2])
 
 # basic expressions
 def p_expression_uminus(p):
@@ -112,7 +115,9 @@ def p_expression_binop(p):
 
 def p_expression_number(p):
     '''expression : INTNUM
-                  | FLOAT'''
+                  | FLOAT
+                  | list
+                  '''
     p[0] = p[1]
 
 def p_expression_name(p):
