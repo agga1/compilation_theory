@@ -111,7 +111,17 @@ def p_expression_uminus(p):
 
 def p_zeros(p):
     """expression : ZEROS '(' INTNUM ')'"""
-    p[0] = np.zeros(p[3])
+    p[0] = np.zeros((p[3], p[3]))
+
+def p_ones(p):
+    """expression : ONES '(' INTNUM ')'"""
+    p[0] = np.ones((p[3], p[3]))
+
+
+def p_eye(p):
+    """expression : EYE '(' INTNUM ')'"""
+    p[0] = np.eye(p[3])
+
 
 def p_expression_binop(p):
     """expression : expression '+' expression
