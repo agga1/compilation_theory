@@ -2,7 +2,7 @@ import ply.lex as lex
 from ply import yacc
 import numpy as np
 
-from expression import Expression, expression_factory, ExpressionList
+from expression import expression_factory, ExpressionList
 
 reserved = {
     'if': 'IF',
