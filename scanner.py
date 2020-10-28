@@ -139,7 +139,8 @@ def p_expression_binop(p):
 
 def p_expression_number(p):
     '''expression : INTNUM
-                  | FLOAT'''
+                  | FLOAT
+                  | list'''
     p[0] = p[1]
 
 def p_expression_name(p):
