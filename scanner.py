@@ -2,6 +2,8 @@ import ply.lex as lex
 from ply import yacc
 import numpy as np
 
+from expression import Expression, expression_factory, ExpressionList
+
 reserved = {
     'if': 'IF',
     'else': 'ELSE',
@@ -21,10 +23,10 @@ tokens = ['DOTADD', 'DOTSUB', 'DOTMUL', 'DOTDIV',
           'EQ', 'LT', 'GT', 'LTE', 'GTE', 'DIFF',
           'STR', 'ID', 'INTNUM', 'FLOAT'] + list(reserved.values())
 
-t_DOTADD = r'.\+'
-t_DOTSUB = r'.-'
-t_DOTMUL = r'.\*'
-t_DOTDIV = r'./'
+t_DOTADD = r'\.\+'
+t_DOTSUB = r'\.-'
+t_DOTMUL = r'\.\*'
+t_DOTDIV = r'\./'
 t_ADDASSIGN = r'\+='
 t_SUBASSIGN = r'-='
 t_MULASSIGN = r'\*='
@@ -132,20 +134,18 @@ def p_expression_binop(p):
                   | expression DOTDIV expression
                   | expression DOTSUB expression
                   | expression DOTMUL expression"""
-    if isinstance(p[1], np.ndarray):
-        print("yes")
-    if p[2] == '+': p[0] = p[1] + p[3]
-    elif p[2] == '-': p[0] = p[1] - p[3]
-    elif p[2] == '*': p[0] = p[1] * p[3]
-    elif p[2] == '/': p[0] = p[1] / p[3]
-    elif p[2] == '.+':
-        p[0] = p[1] + p[3]
-    elif p[2] == './':
-        p[0] = p[1] / p[3]
-    elif p[2] == '.-':
-        p[0] = p[1] - p[3]
-    elif p[2] == '.*':
-        p[0] = p[1] * p[3]
+    # print("p1", p[2])
+    p1 = expression_factory(p[1])
+    # print("p2", p[2])
+    p2 = expression_factory(p[3])
+    p[0] = p1.eval(p[2], p2)
+    # print("result", p[0], p[2] )
+
+def p_expression_transpose(p):
+    """expression : expression "\'" """
+    p1 = ExpressionList(p[1])
+    p[0] = p1.transpose()
+
 
 def p_expression_number(p):
     '''expression : INTNUM
