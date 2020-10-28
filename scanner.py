@@ -127,11 +127,16 @@ def p_expression_binop(p):
     p[0] = p1.eval(p[2], p2)
     # print("result", p[0], p[2] )
 
+def p_number(p):
+    """number : INTNUM
+                | FLOAT """
+    p[0] = p[1]
 
 def p_expression_number(p):
-    '''expression : INTNUM
-                  | FLOAT
-                  | list'''
+    '''expression : number
+                  | row
+                  | matrix
+                  | id_partial '''
     p[0] = p[1]
 
 def p_expression_name(p):
@@ -147,52 +152,73 @@ def p_expression_group(p):
     p[0] = p[2]
 
 # MATRIX ops ------------------------------------------------
+def p_statement_update(p):
+    """statement :  ID '[' index_ref ']' '=' expression
+                 | ID '[' index_ref_pair ']' '=' expression"""
+    try:
+        M = names[p[1]]
+        if isinstance(p[3], tuple):
+            M[p[3][0], p[3][1]] = p[6]
+        else:
+            M[p[3]] = p[6]
+    except LookupError:
+        print(f"Undefined name {p[1]!r}")
+
 def p_range(p):
     """range : INTNUM ':' INTNUM"""
     p[0] = [i for i in range(p[1], p[3])]
 
-def p_index_ref_first(p):
+def p_index_ref(p):
     """index_ref : INTNUM
                 | range """
     p[0] = p[1]
 
-def p_index_ref_list(p):
-    """index_ref_list : index_ref """
-    p[0] = [ p[1] ]
-
-def p_index_ref_list_extend(p):
-    """index_ref_list : index_ref_list ',' index_ref"""
-    p[0] = p[1]
-    p[0].append(p[3])
+def p_index_ref_pair(p):
+    """index_ref_pair : index_ref ',' index_ref """
+    p[0] = ( p[1], p[3] )
 
 def p_matrix_part(p):
-    """expression : ID '[' index_ref_list ']' """
+    """id_partial : ID '[' index_ref ']'
+                    |  ID '[' index_ref_pair ']'"""
     try:
         M = names[p[1]]
-        for x in p[3]:
-            M = M[x]
-        p[0] = M
+        if isinstance(p[3], tuple):
+            p[0] = M[p[3][0], p[3][1]]
+        else:
+            p[0] = M[p[3]]
     except LookupError:
         print(f"Undefined name {p[1]!r}")
         p[0] = 0
 
-
-def p_list(p):
-    """list : '[' value_list ']' """
+def p_matrix(p):
+    """matrix : '[' row_list ']' """
     p[0] = np.array(p[2])
 
-def p_list_first(p):
-    """value_list : expression
-    """
-    p[0] = [ p[1] ]
-
-
-def p_list_extend(p):
-    """value_list : value_list ','  expression
+def p_matrix_extend(p):
+    """row_list : row_list ','  row
     """
     p[0] = p[1]
     p[0].append(p[3])
 
+def p_matrix_first(p):
+    """row_list : row
+    """
+    p[0] = [ p[1] ]
+
+def p_row(p):
+    """row : '[' value_list ']' """
+    p[0] = np.array(p[2])
+
+def p_num_list_extend(p):
+    """value_list : value_list ','  number
+    """
+    p[0] = p[1]
+    p[0].append(p[3])
+
+def p_num_list_first(p):
+    """value_list : number
+    """
+    p[0] = [ p[1] ]
 
 def p_zeros(p):
     """expression : ZEROS '(' INTNUM ')'"""
