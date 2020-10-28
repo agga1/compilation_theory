@@ -6,8 +6,8 @@ import scanner
 class TestScanner(unittest.TestCase):
 
     def test_whole(self):
-        test_name = "../example.txt"
-        answer_name = "../answer.txt"
+        test_name = "../examples/example_whole.txt"
+        answer_name = "../examples/answer_whole.txt"
         try:
             test_file = open(test_name, "r")
             text = test_file.read()

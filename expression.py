@@ -51,7 +51,7 @@ class ExpressionList(Expression):
                 return self + other
             elif operator == '.-':
                 return self - other
-            elif operator == '.*':
+            elif operator == '.*':  # careful! a*b works like dot multiplication in numpy!
                 return self.value * other.value
             elif operator == './':
                 return self / other
