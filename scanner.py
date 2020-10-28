@@ -1,6 +1,7 @@
 import ply.lex as lex
 from ply import yacc
 import numpy as np
+
 reserved = {
     'if': 'IF',
     'else': 'ELSE',
@@ -79,8 +80,8 @@ lexer = lex.lex()
 precedence = (
     ('left','+','-'),
     ('left','*','/'),
-    ('left','DOTADD','DOTSUB'),
-    ('left','DOTMUL','DOTDIV'),
+    ('left', 'DOTADD', 'DOTSUB'),
+    ('left', 'DOTMUL', 'DOTDIV'),
     ('right', 'UMINUS'),
 )
 
@@ -93,7 +94,10 @@ def p_statement_assign(p):
     names[p[1]] = p[3]
 
 def p_statement_expr(p):
-    'statement : expression'
+    """statement : expression
+                | logical
+                | if
+    """
     print(p[1])
 
 def p_expression_print(p):
@@ -135,12 +139,11 @@ def p_expression_binop(p):
 
 def p_expression_number(p):
     '''expression : INTNUM
-                    | FLOAT
-                  | list'''
+                  | FLOAT'''
     p[0] = p[1]
 
 def p_expression_name(p):
-    'expression : ID'
+    """expression : ID"""
     try:
         p[0] = names[p[1]]
     except LookupError:
@@ -148,23 +151,53 @@ def p_expression_name(p):
         p[0] = 0
 
 def p_expression_group(p):
-    '''expression : '(' expression  ')' '''
+    """expression : '(' expression  ')' """
     p[0] = p[2]
 
 # list and matrix
 def p_list(p):
-    """list : '[' value_list ']'"""
+    """list : '[' value_list ']' """
     p[0] = np.array(p[2])
 
 def p_list_first(p):
-    """value_list : expression"""
+    """value_list : expression
+    """
     p[0] = [ p[1] ]
 
 
 def p_list_extend(p):
-    """value_list : value_list ','  expression"""
+    """value_list : value_list ','  expression
+    """
     p[0] = p[1]
     p[0].append(p[3])
+
+def p_logical(p):
+    """logical : expression EQ expression
+                | expression LT expression
+                | expression GT expression
+                | expression LTE expression
+                | expression GTE expression
+                | expression DIFF expression
+    """
+    if p[2] == t_EQ  : p[0] = p[1] == p[3]
+    elif p[2] == t_LT  : p[0] = p[1] < p[3]
+    elif p[2] == t_GT  : p[0] = p[1] > p[3]
+    elif p[2] == t_LTE : p[0] = p[1] <= p[3]
+    elif p[2] == t_GTE : p[0] = p[1] >= p[3]
+    elif p[2] == t_DIFF: p[0] = p[1] != p[3]
+
+
+def p_if(p):
+    """if : IF '(' logical ')' expression
+          | IF '(' logical ')' '{' expression '}'
+    """
+    if '{' in p:
+        exp = p[6]
+    else:
+        exp = p[5]
+    if p[3]:
+        p[0] = exp
+
 
 def p_error(p):
     print("Syntax error in input!")
