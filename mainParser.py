@@ -2,6 +2,20 @@
 
 import sys
 import scanner  # scanner.py is a file you create, (it is not an external library)
+
+file = None
+lexer = scanner.lexer
+
+def get_token():
+    while True:
+        tok = lexer.token()
+        if tok is not None: return tok
+        try:
+            line = next(file)
+            lexer.input(line)
+        except StopIteration:
+            return None
+
 if __name__ == '__main__':
     # -------from file
     # TODO currently parsing by lines, should parse whole file and recognize ';'
@@ -12,10 +26,11 @@ if __name__ == '__main__':
         print("Cannot open {0} file".format(filename))
         sys.exit(0)
 
-    text = file.readlines()
+    text = file.read()
     parser = scanner.parser
-    for line in text:
-        parser.parse(line)
+    parser.parse(text)
+    # for l in text:
+    #     parser.parse(l)
 
     console = True
     # ------from console
