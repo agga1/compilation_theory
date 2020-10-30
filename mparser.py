@@ -8,9 +8,11 @@ precedence = (
     ('left','*','/'),
     ('left', 'DOTADD', 'DOTSUB'),
     ('left', 'DOTMUL', 'DOTDIV'),
+    ('right', ':'),
     ('right', 'UMINUS'),
     ('nonassoc',    'IFX'),
     ('nonassoc',    'ELSE'),
+
 )
 
 # dictionary of names (for storing variables)
@@ -32,7 +34,9 @@ def p_any_statements(p):
 def p_no_semi_statements(p):
     """no_semi_statement : if
                          | while
-                         | for"""
+                         | for
+                         | statement_block """
+    #     | for
 
 def p_statement_expr(p):
     """statement : expression
@@ -52,6 +56,16 @@ def p_statement_update(p):
                 | id_whole_or_part SUBASSIGN expression
                 | id_whole_or_part DIVASSIGN expression
                 | id_whole_or_part MULASSIGN expression"""
+
+# RETURN -----------------------------------------
+
+def p_return_statement(p):
+    """statement : RETURN
+                 | RETURN expression"""
+
+def p_break_continue_statement(p):
+    """statement : BREAK
+                 | CONTINUE """
 
 # EXPRESSION -------------------------------------
 def p_expression_uminus(p):
@@ -104,12 +118,13 @@ def p_number(p):
 
 # INDEX_REF ------------------------------------------------
 def p_range(p):
-    """range : INTNUM ':' INTNUM"""
+    """range : expression ':' expression"""
+    print("range")
 
 def p_index_ref(p):
-    """index_ref : INTNUM
+    """index_ref : expression
                 | range
-                | index_ref ',' INTNUM
+                | index_ref ',' expression
                 | index_ref ',' range"""
 
 def p_matrix_part(p):
@@ -135,32 +150,37 @@ def p_logical(p):
 
 # IF FOR WHILE -------------------------------------------------
 def p_statement_block(p):
-    """statement_block : any_statement
-                       | '{' statements '}' """
+    """statement_block : '{' statements '}' """
+    print("statement_block")
+
 def p_if(p):
-    """if : IF '(' logical ')' statement_block %prec IFX
-            |  IF '(' logical ')' statement_block else_block
+    """if : IF '(' logical ')' any_statement %prec IFX
+            |  IF '(' logical ')' any_statement else_block
     """
-    # print("got if")
+    print("if")
 
 def p_else(p):
-    """else_block : ELSE statement_block
+    """else_block : ELSE any_statement
     """
-    # print("got else")
+    print("else")
 
 def p_while(p):
     """while : WHILE '(' logical ')' any_statement
-          | WHILE '(' logical ')' '{' statements '}'
     """
+    print("while")
 
 def p_for(p):
     """for : FOR ID '=' range any_statement
-          | FOR ID '=' range '{' statements '}'
     """
+    print("for")
 
 # ERROR -------------------------------------------------
 def p_error(p):
-    print("Syntax error in input!")
+    if p:
+        print(f"--Syntax error: \n\t({p.lineno}), token: type {p.type}, '{p.value}'")
+    else:
+        print("--Syntax error: No more input")
+
 
 parser = yacc.yacc()
 
