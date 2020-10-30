@@ -1,46 +1,56 @@
 import sys
 import unittest
 from io import StringIO
-
-import scanner
+import mparser
 
 
 class TestParser(unittest.TestCase):
 
     def setUp(self):
-        self.parser = scanner.parser
+        self.parser = mparser.parser
 
     def test_group(self):
-        self.check("(1+2)*4", "12\n")
-        self.check("(1+(2+(3*2)-5))", "4\n")
+        self.assertAccepted("(1+2)*4;")
+        self.assertAccepted("(1+(2+(3*2)-5));")
 
     def test_binop(self):
-        a = 3
-        b = 6
-        ans_add = "9\n"
-        ans_sub = "-3\n"
-        ans_div = "0.5\n"
-        ans_mul = "18\n"
-        self.check(f"{a} + {b}", ans_add)
-        self.check(f"{a} - {b}", ans_sub)
-        self.check(f"{a} / {b}", ans_div)
-        self.check(f"{a} * {b}", ans_mul)
+        self.assertAccepted(f"a + 3;")
+        self.assertAccepted(f"2 - b;")
+        self.assertAccepted(f"a / b;")
+        self.assertAccepted(f"a * b;")
+        self.assertAccepted(f"a .+ b;")
+        self.assertAccepted(f"a .- b;")
+        self.assertAccepted(f"a ./ b;")
+        self.assertAccepted(f"a .* b;")
 
-    def test_binop_ndarray(self):
-        a = "[1,2]"
-        b = "[3,4]"
-        ans_add = "[4 6]\n"
-        ans_dotadd = "[4 6]\n"
-        ans_dotmul = "[3 8]\n"
-        ans_mul = "11\n"
-        self.check(f"{a} + {b}", ans_add)
-        self.check(f"{a} .+ {b}", ans_dotadd)
-        self.check(f"{a} .* {b}", ans_dotmul)
-        self.check(f"{a} * {b}", ans_mul)
+    def test_assign(self):
+        self.assertAccepted(f"a += b;")
+        self.assertAccepted(f"a = b;")
+        self.assertAccepted(f"a[1:n,y] = b;")
+        self.assertAccepted(f"a[1,3] = b;")
+        self.assertAccepted(f"a[1:5,3] = b;")
+        self.assertAccepted(f"a[1:5,3] += b;")
 
-    def check(self, input, answer):
+    def test_if(self):
+        self.assertAccepted("if(2==3) print \"hi\";")
+        self.assertAccepted("if(2==3) print \"hi\"; else a = 4;")
+        self.assertAccepted("if(2==3) {print \"hi\";} else a = 4;")
+        self.assertFailed("if(2==3) {print \"hi\"; else a = 4;}")
+
+    def test_for(self):
+        self.assertAccepted("for i = 1:10 print 3;")
+        self.assertAccepted("for i = n:10 -3;")
+        self.assertAccepted("for i = 1:n -3;")
+        self.assertAccepted("for i = 1:10 {print 3;}")
+
+
+    def assertAccepted(self, input):
         output = self.get_ans(input)
-        self.assertEqual(output, answer, f"Should be {answer}")
+        self.assertEqual(output, "", f"Got syntax error")
+
+    def assertFailed(self, input):
+        output = self.get_ans(input)
+        self.assertNotEqual(output, "", f"Expression falsely accepted")
 
     def get_ans(self, input_str):
         backup = sys.stdout
