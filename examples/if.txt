@@ -11,13 +11,14 @@ C = A.+B ;  # add element-wise A to B
 C = A.-B ;  # substract B from A
 C = A.*B ;  # multiply element-wise A with B
 C = A./B ;  # divide element-wise A by B
-(a+(b+c))
+(a+(b+c));
 C += B ;  # add B to C
 C -= B ;  # substract B from C
 C *= A ;  # multiply A with C
 if(N==10)
     print "N==10";
-else print "b";
+else if(N==3)
+{print "b";}
 print a;
 print b;
 #a = [[1],

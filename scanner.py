@@ -84,6 +84,8 @@ precedence = (
     ('left', 'DOTADD', 'DOTSUB'),
     ('left', 'DOTMUL', 'DOTDIV'),
     ('right', 'UMINUS'),
+    ('nonassoc',    'IFX'),
+    ('nonassoc',    'ELSE'),
 )
 
 # dictionary of names (for storing variables)
@@ -208,17 +210,19 @@ def p_logical(p):
     """
 
 # IF  -------------------------------------------------
+def p_statement_block(p):
+    """statement_block : any_statement
+                       | '{' statements '}' """
 def p_if(p):
-    """if : IF '(' logical ')' any_statement else_block
-          | IF '(' logical ')' '{' statements '}' else_block
+    """if : IF '(' logical ')' statement_block %prec IFX
+            |  IF '(' logical ')' statement_block else_block
     """
-    print("got if")
+    # print("got if")
 
 def p_else(p):
-    """else_block : ELSE any_statement
-                  | ELSE '{' statements '}'
+    """else_block : ELSE statement_block
     """
-    print("got else")
+    # print("got else")
 
 def p_while(p):
     """while : WHILE '(' logical ')' any_statement
