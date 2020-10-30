@@ -42,7 +42,7 @@ def p_statement_expr(p):
     """statement : expression
                 """
 def p_statement_print(p):
-    """statement : PRINT expression"""
+    """statement : PRINT value_list"""
 
 def p_statement_assign(p):
     """statement : id_whole_or_part '=' expression """
@@ -119,7 +119,7 @@ def p_number(p):
 # INDEX_REF ------------------------------------------------
 def p_range(p):
     """range : expression ':' expression"""
-    print("range")
+    # print("range")
 
 def p_index_ref(p):
     """index_ref : expression
@@ -151,28 +151,28 @@ def p_logical(p):
 # IF FOR WHILE -------------------------------------------------
 def p_statement_block(p):
     """statement_block : '{' statements '}' """
-    print("statement_block")
+    # print("statement_block")
 
 def p_if(p):
     """if : IF '(' logical ')' any_statement %prec IFX
             |  IF '(' logical ')' any_statement else_block
     """
-    print("if")
+    # print("if")
 
 def p_else(p):
     """else_block : ELSE any_statement
     """
-    print("else")
+    # print("else")
 
 def p_while(p):
     """while : WHILE '(' logical ')' any_statement
     """
-    print("while")
+    # print("while")
 
 def p_for(p):
     """for : FOR ID '=' range any_statement
     """
-    print("for")
+    # print("for")
 
 # ERROR -------------------------------------------------
 def p_error(p):
