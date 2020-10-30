@@ -2,7 +2,7 @@
 
 import sys
 import scanner  # scanner.py is a file you create, (it is not an external library)
-
+import mparser
 file = None
 lexer = scanner.lexer
 
@@ -18,7 +18,6 @@ def get_token():
 
 if __name__ == '__main__':
     # -------from file
-    # TODO currently parsing by lines, should parse whole file and recognize ';'
     try:
         filename = sys.argv[1] if len(sys.argv) > 1 else "examples/if.txt"
         file = open(filename, "r")
@@ -27,7 +26,7 @@ if __name__ == '__main__':
         sys.exit(0)
 
     text = file.read()
-    parser = scanner.parser
+    parser = mparser.parser
     parser.parse(text)
     # for l in text:
     #     parser.parse(l)
@@ -35,7 +34,7 @@ if __name__ == '__main__':
     console = True
     # ------from console
     if console:
-        parser = scanner.parser
+        parser = mparser.parser
         s = input('scanner >')
         while(s != 'q'):
             res = parser.parse(s)
