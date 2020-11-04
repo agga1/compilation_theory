@@ -1,7 +1,6 @@
 import ply.yacc as yacc
 from scanner import tokens
 
-# Precedence rules for the arithmetic operators
 precedence = (
     ('nonassoc', 'IFX'),
     ('nonassoc', 'ELSE'),
@@ -11,9 +10,12 @@ precedence = (
     ('left','*','/'),
     ('left', 'DOTADD', 'DOTSUB'),
     ('left', 'DOTMUL', 'DOTDIV'),
-    ('right', ':'),
+    ('nonassoc', ':'),
     ('right', 'UMINUS'),
+    ('nonassoc', 'WHOLE'),
+    ('nonassoc', 'PART'),
 )
+# Precedence rules for the arithmetic operators
 
 # dictionary of names (for storing variables)
 names = { }
@@ -21,6 +23,7 @@ names = { }
 # statement
 def p_start(p):
     """start : statements
+            | empty
              """
 def p_statements(p):
     """statements : any_statement
@@ -86,10 +89,11 @@ def p_expression_number(p):
                   | list
                   | STR
                   | logical
+                  | id_partial %prec PART
                   '''
 
 def p_expression_name(p):
-    """expression : ID"""
+    """expression : ID %prec WHOLE """
 
 
 def p_expression_group(p):
@@ -118,7 +122,6 @@ def p_number(p):
 # INDEX_REF ------------------------------------------------
 def p_range(p):
     """range : expression ':' expression"""
-    # print("range")
 
 def p_index_ref(p):
     """index_ref : expression
@@ -151,28 +154,26 @@ def p_logical(p):
 # IF FOR WHILE -------------------------------------------------
 def p_statement_block(p):
     """statement_block : '{' statements '}' """
-    # print("statement_block")
 
 def p_if(p):
     """if : IF '(' logical ')' any_statement %prec IFX
             |  IF '(' logical ')' any_statement else_block
     """
-    # print("if")
 
 def p_else(p):
     """else_block : ELSE any_statement
     """
-    # print("else")
 
 def p_while(p):
     """while : WHILE '(' logical ')' any_statement
     """
-    # print("while")
 
 def p_for(p):
     """for : FOR ID '=' range any_statement
     """
-    # print("for")
+
+def p_empty(p):
+    """empty :"""
 
 # ERROR -------------------------------------------------
 def p_error(p):
