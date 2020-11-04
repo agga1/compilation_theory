@@ -10,7 +10,7 @@ precedence = (
     ('left','*','/'),
     ('left', 'DOTADD', 'DOTSUB'),
     ('left', 'DOTMUL', 'DOTDIV'),
-    ('nonassoc', ':'),
+    ('right', ':'),
     ('right', 'UMINUS'),
     ('nonassoc', 'WHOLE'),
     ('nonassoc', 'PART'),
@@ -39,7 +39,6 @@ def p_no_semi_statements(p):
                          | while
                          | for
                          | statement_block """
-    #     | for
 
 def p_statement_expr(p):
     """statement : expression
@@ -94,6 +93,7 @@ def p_expression_number(p):
 
 def p_expression_name(p):
     """expression : ID %prec WHOLE """
+
 
 
 def p_expression_group(p):
