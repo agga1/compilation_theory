@@ -3,6 +3,9 @@ from scanner import tokens
 
 # Precedence rules for the arithmetic operators
 precedence = (
+    ('nonassoc', 'IFX'),
+    ('nonassoc', 'ELSE'),
+    ('nonassoc', '=', 'SUBASSIGN', 'ADDASSIGN', 'MULASSIGN', 'DIVASSIGN'),
     ('left','LT','GT', 'GTE', 'LTE', 'EQ', 'DIFF'),
     ('left','+','-'),
     ('left','*','/'),
@@ -10,9 +13,6 @@ precedence = (
     ('left', 'DOTMUL', 'DOTDIV'),
     ('right', ':'),
     ('right', 'UMINUS'),
-    ('nonassoc',    'IFX'),
-    ('nonassoc',    'ELSE'),
-
 )
 
 # dictionary of names (for storing variables)
@@ -83,7 +83,6 @@ def p_expression_binop(p):
 
 def p_expression_number(p):
     '''expression : number
-                  | id_partial
                   | list
                   | STR
                   | logical
@@ -132,7 +131,8 @@ def p_matrix_part(p):
 
 # # LIST -----------------------------------------------------
 def p_list(p):
-    """list : '[' value_list ']' """
+    """list : '[' value_list ']'
+                | '[' ']' """
 
 def p_num_list_extend(p):
     """value_list : expression
