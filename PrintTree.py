@@ -32,7 +32,7 @@ class TreePrinter:
     @add_to_class(Number)
     def print_tree(self, indent=0):
         # print("number")
-        self.children[0].print_tree(indent) # todo +1?
+        self.children[0].print_tree(indent) # todo +1? >> no coz quiet print
 
     @staticmethod
     @add_to_class(IntNum)
@@ -65,23 +65,23 @@ class TreePrinter:
     @staticmethod
     @add_to_class(PartialId)
     def print_tree(self, indent=0):
-        print("PartialID")
-        self.children[0].print_tree(indent)
-        self.children[1].print_tree(indent)
+        print_with_indent(indent,"PartialID")
+        self.children[0].print_tree(indent+1)
+        self.children[1].print_tree(indent+1)
 
     @staticmethod
     @add_to_class(ValueList)
     def print_tree(self, indent=0):
         print_with_indent(indent, "values")
         for ch in self.children:
-            ch.print_tree(indent)
+            ch.print_tree(indent+1)
 
     @staticmethod
     @add_to_class(IndexRef)
     def print_tree(self, indent=0):
         print_with_indent(indent, "index_refs")
         for ch in self.children:
-            ch.print_tree(indent)
+            ch.print_tree(indent+1)
 
     @staticmethod
     @add_to_class(Assign)
@@ -131,7 +131,7 @@ class TreePrinter:
     @add_to_class(Print)
     def print_tree(self, indent=0):
         print_with_indent(indent, "PRINT")
-        self.children[0].print_tree(indent)
+        self.children[0].print_tree(indent+1)
 
     @staticmethod
     @add_to_class(Break)
@@ -157,7 +157,7 @@ class TreePrinter:
     @add_to_class(MatrixCreator)
     def print_tree(self, indent=0):
         print_with_indent(indent, self.children[0])
-        self.children[1].print_tree(indent)
+        self.children[1].print_tree(indent+1)
 
 
     @staticmethod
