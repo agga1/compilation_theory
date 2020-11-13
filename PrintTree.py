@@ -1,4 +1,4 @@
-from myAst import *
+from ast import *
 
 
 def add_to_class(cls):
@@ -20,7 +20,6 @@ class TreePrinter:
     @staticmethod
     @add_to_class(Program)
     def print_tree(self, indent=0):
-        # print("program")
         self.children[0].print_tree(indent)
 
     @staticmethod
@@ -33,8 +32,7 @@ class TreePrinter:
     @add_to_class(Number)
     def print_tree(self, indent=0):
         # print("number")
-        # self.children[0].print_tree(indent) # todo +1?
-        print_with_indent(indent, self.children[0])
+        self.children[0].print_tree(indent) # todo +1?
 
     @staticmethod
     @add_to_class(IntNum)
@@ -49,12 +47,7 @@ class TreePrinter:
     @staticmethod
     @add_to_class(Expression)
     def print_tree(self, indent=0):
-        # print("expr")
-        if isinstance(self.children[0], Node):
-            self.children[0].print_tree(indent)
-        else:
-            print("expr not a node!!")
-            print_with_indent(indent, self.children[0])
+        self.children[0].print_tree(indent)
 
     @staticmethod
     @add_to_class(Statements)
@@ -70,9 +63,23 @@ class TreePrinter:
         self.children[0].print_tree(indent)
 
     @staticmethod
+    @add_to_class(PartialId)
+    def print_tree(self, indent=0):
+        print("PartialID")
+        self.children[0].print_tree(indent)
+        self.children[1].print_tree(indent)
+
+    @staticmethod
     @add_to_class(ValueList)
     def print_tree(self, indent=0):
         print_with_indent(indent, "values")
+        for ch in self.children:
+            ch.print_tree(indent)
+
+    @staticmethod
+    @add_to_class(IndexRef)
+    def print_tree(self, indent=0):
+        print_with_indent(indent, "index_refs")
         for ch in self.children:
             ch.print_tree(indent)
 
@@ -150,7 +157,7 @@ class TreePrinter:
     @add_to_class(MatrixCreator)
     def print_tree(self, indent=0):
         print_with_indent(indent, self.children[0])
-        print_with_indent(indent, self.children[1])
+        self.children[1].print_tree(indent)
 
 
     @staticmethod

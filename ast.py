@@ -121,6 +121,17 @@ class MatrixCreator(Node):
         self.keyword = keyword
         self.n = n
 
+class PartialId(Node):
+    def __init__(self, identifier, index_ref):
+        super().__init__([identifier, index_ref])
+        self.identifier = identifier
+        self.index_ref = index_ref
+
+class IndexRef(Node):
+    def __init__(self, values):
+        super().__init__(values)
+        self.values = values
+
 # ---------------------if while for
 
 class If(Node):

@@ -134,7 +134,7 @@ def p_create_matrix(p):
                   | ONES '(' INTNUM ')'
                   | EYE '(' INTNUM ')'
     """
-    p[0] = MatrixCreator(p[1], p[3])
+    p[0] = MatrixCreator(p[1], IntNum(p[3]))
 
 def p_expression_transpose(p):
     """expression : expression "\'" """
@@ -145,9 +145,9 @@ def p_number(p):
     """number : INTNUM
               | FLOAT """
     if isinstance(p[1], int):
-        p[0] = Number(p[1])
+        p[0] = Number(IntNum(p[1]))
     else:
-        p[0] = Number(p[1])
+        p[0] = Number(FloatNum(p[1]))
 
 
 # INDEX_REF ------------------------------------------------
@@ -160,9 +160,14 @@ def p_index_ref(p):
                 | range
                 | index_ref ',' expression
                 | index_ref ',' range"""
+    if len(p) == 2:
+        p[0] = IndexRef([p[1]])
+    else:
+        p[0] = IndexRef(p[1].values+[p[3]])
 
 def p_matrix_part(p):
     """id_partial : ID '[' index_ref ']' """
+    p[0] = PartialId(Identifier(p[1]), p[3])
 
 # # LIST -----------------------------------------------------
 def p_list(p): # todo with [[Prev], new_one]??
