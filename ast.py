@@ -19,6 +19,11 @@ class Number(Node):
         super().__init__([number])
         self.number = number
 
+class StatementBlock(Node):
+    def __init__(self, statements):
+        super().__init__([statements])
+        self.statements = statements
+
 class IntNum(Node):
     def __init__(self, number):
         super().__init__([number])

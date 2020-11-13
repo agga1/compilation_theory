@@ -15,11 +15,12 @@ if __name__ == '__main__':
     prog = parser.parse(text)
     prog.print_tree()
 
-    console = True
     # ------from console
-    if console:
-        parser = mparser.parser
+    print("-----------------------------------")
+    print("console mode -- type 'q' to quit ")
+    parser = mparser.parser
+    s = input('scanner >')
+    while(s != 'q'):
+        res = parser.parse(s)
+        res.print_tree()
         s = input('scanner >')
-        while(s != 'q'):
-            res = parser.parse(s)
-            s = input('scanner >')

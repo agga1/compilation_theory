@@ -121,7 +121,6 @@ class TreePrinter:
     @add_to_class(Range)
     def print_tree(self, indent=0):
         print_with_indent(indent, "RANGE")
-
         self.children[0].print_tree(indent + 1)
         self.children[1].print_tree(indent + 1)
 
@@ -136,10 +135,7 @@ class TreePrinter:
     def print_tree(self, indent=0):
         print_with_indent(indent, "IF")
         self.children[0].print_tree(indent+1)
-
-        print_with_indent(indent, "THEN")
         self.children[1].print_tree(indent + 1)
-
         if len(self.children) == 3:
             self.children[2].print_tree(indent)
 
@@ -154,8 +150,14 @@ class TreePrinter:
     def print_tree(self, indent=0):
         print_with_indent(indent, "WHILE")
         self.children[0].print_tree(indent+1)
-        print_with_indent(indent, "DO")
-        self.children[1].print_tree(indent + 1)
+        self.children[1].print_tree(indent+1)
+
+    @staticmethod
+    @add_to_class(StatementBlock)
+    def print_tree(self, indent=0):
+        print_with_indent(indent, "statements")
+        for ch in self.children:
+            ch.print_tree(indent+1)
 
     @staticmethod
     @add_to_class(For)
@@ -163,40 +165,4 @@ class TreePrinter:
         print_with_indent(indent, "FOR")
         self.children[0].print_tree(indent+1)
         self.children[1].print_tree(indent+1)
-        print_with_indent(indent, "DO")
         self.children[2].print_tree(indent + 1)
-
-    # @staticmethod
-    # @add_to_class(Expression)
-    # def print_tree(self, indent=0):
-    #     self.children[0].print_tree(indent)
-    #
-    # @staticmethod
-    # @add_to_class(Statements)
-    # def print_tree(self, indent=0):
-    #     # print("statements")
-    #     for ch in self.children:
-    #         ch.print_tree(indent)
-    #
-    # @staticmethod
-    # @add_to_class(Statement)
-    # def print_tree(self, indent=0):
-    #     # print("statement")
-    #     self.children[0].print_tree(indent)
-
-    # @staticmethod
-    # @add_to_class(Program)
-    # def print_tree(self, indent=0):
-    #     self.children[0].print_tree(indent)
-    #
-    # @staticmethod
-    # @add_to_class(Empty)
-    # def print_tree(self, indent=0):
-    #     print("empty")
-    #     pass
-
-    # @staticmethod
-    # @add_to_class(Number)
-    # def print_tree(self, indent=0):
-    #     # print("number")
-    #     self.children[0].print_tree(indent) # todo +1? >> no coz quiet print

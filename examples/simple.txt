@@ -7,5 +7,5 @@ a = [1,2,3];
 print 4,a;
 if(a>3) print 4,3,2,1;
 else print 2;
-while(a<4) a=4;
-for a = 3:4 7;
+while(a<4) {a=4; b+=3;}
+for a = 3:n+4 7;
