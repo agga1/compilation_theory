@@ -19,7 +19,7 @@ class Number(Node):
         super().__init__([number])
         self.number = number
 
-class IntNum(Node): # todo parse tokens INT and Float to class?
+class IntNum(Node):
     def __init__(self, number):
         super().__init__([number])
         self.number = number

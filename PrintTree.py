@@ -12,12 +12,8 @@ def add_to_classes(*classes):
             setattr(cls, func.__name__, func)
     return decorator
 
-
 def print_with_indent(indent, msg):
-    for i in range(indent):
-        print("|  ", end="")
-    print(msg)
-
+    print(f"{'|  ' * indent}{msg}")
 
 class TreePrinter:
     def __init__(self):
@@ -39,7 +35,6 @@ class TreePrinter:
     @add_to_class(FloatNum)
     def print_tree(self, indent=0):
         print_with_indent(indent, f"float: {self.children[0]}")
-
 
     @staticmethod
     @add_to_class(PartialId)
@@ -122,7 +117,6 @@ class TreePrinter:
     def print_tree(self, indent=0):
         print_with_indent(indent, "CONTINUE")
 
-
     @staticmethod
     @add_to_class(Range)
     def print_tree(self, indent=0):
@@ -131,13 +125,11 @@ class TreePrinter:
         self.children[0].print_tree(indent + 1)
         self.children[1].print_tree(indent + 1)
 
-
     @staticmethod
     @add_to_class(MatrixCreator)
     def print_tree(self, indent=0):
         print_with_indent(indent, self.children[0])
         self.children[1].print_tree(indent+1)
-
 
     @staticmethod
     @add_to_class(If)

@@ -127,7 +127,7 @@ def p_expression_string(p):
 
 def p_expression_group(p):
     """expression : '(' expression  ')' """
-    p[0] = Expression(p[1]) # todo ?? GroupExpr ??
+    p[0] = Expression(p[1])
 
 def p_create_matrix(p):
     """expression : ZEROS '(' INTNUM ')'
@@ -170,7 +170,7 @@ def p_matrix_part(p):
     p[0] = PartialId(Identifier(p[1]), p[3])
 
 # # LIST -----------------------------------------------------
-def p_list(p): # todo with [[Prev], new_one]??
+def p_list(p):
     """list : '[' value_list ']'
                 | '[' ']' """
     if len(p) == 4:
@@ -202,7 +202,7 @@ def p_logical(p):
 # IF FOR WHILE -------------------------------------------------
 def p_statement_block(p):
     """statement_block : '{' statements '}' """
-    p[0] = p[2] # todo StatementBlock(p[2]) ?
+    p[0] = p[2]
 
 def p_if(p):
     """if : IF '(' logical ')' any_statement %prec IFX
