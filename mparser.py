@@ -12,9 +12,9 @@ precedence = (
     ('left', 'DOTADD', 'DOTSUB'),
     ('left', 'DOTMUL', 'DOTDIV'),
     ('right', ':'),
+    ("right", 'ID', '['),
     ('right', 'UMINUS'),
-    ('nonassoc', 'WHOLE'),
-    ('nonassoc', 'PART'),
+    ('left','\''),
 )
 # Precedence rules for the arithmetic operators
 
@@ -113,12 +113,12 @@ def p_expression_number(p):
     '''expression : number
                   | list
                   | logical
-                  | id_partial %prec PART
+                  | id_partial
                   '''
     p[0] = Expression(p[1])
 
 def p_expression_name(p):
-    """expression : ID %prec WHOLE """
+    """expression : ID"""
     p[0] = Expression(Identifier(p[1]))
 
 def p_expression_string(p):
