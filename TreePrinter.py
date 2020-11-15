@@ -39,14 +39,14 @@ class TreePrinter:
     @staticmethod
     @add_to_class(PartialId)
     def print_tree(self, indent=0):
-        print_with_indent(indent,"PartialID")
+        print_with_indent(indent,"REF")
         self.children[0].print_tree(indent+1)
         self.children[1].print_tree(indent+1)
 
     @staticmethod
     @add_to_class(ValueList)
     def print_tree(self, indent=0):
-        print_with_indent(indent, "values")
+        print_with_indent(indent, "VECTOR")
         for ch in self.children:
             ch.print_tree(indent+1)
 
@@ -125,6 +125,12 @@ class TreePrinter:
         self.children[1].print_tree(indent + 1)
 
     @staticmethod
+    @add_to_class(Transpose)
+    def print_tree(self, indent=0):
+        print_with_indent(indent, "TRANSPOSE")
+        self.children[0].print_tree(indent+1)
+
+    @staticmethod
     @add_to_class(MatrixCreator)
     def print_tree(self, indent=0):
         print_with_indent(indent, self.children[0])
@@ -135,6 +141,7 @@ class TreePrinter:
     def print_tree(self, indent=0):
         print_with_indent(indent, "IF")
         self.children[0].print_tree(indent+1)
+        print_with_indent(indent, "THEN")
         self.children[1].print_tree(indent + 1)
         if len(self.children) == 3:
             self.children[2].print_tree(indent)
@@ -150,14 +157,7 @@ class TreePrinter:
     def print_tree(self, indent=0):
         print_with_indent(indent, "WHILE")
         self.children[0].print_tree(indent+1)
-        self.children[1].print_tree(indent+1)
-
-    @staticmethod
-    @add_to_class(StatementBlock)
-    def print_tree(self, indent=0):
-        print_with_indent(indent, "statements")
-        for ch in self.children:
-            ch.print_tree(indent+1)
+        self.children[1].print_tree(indent + 1)
 
     @staticmethod
     @add_to_class(For)

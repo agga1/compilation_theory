@@ -19,11 +19,6 @@ class Number(Node):
         super().__init__([number])
         self.number = number
 
-class StatementBlock(Node):
-    def __init__(self, statements):
-        super().__init__([statements])
-        self.statements = statements
-
 class IntNum(Node):
     def __init__(self, number):
         super().__init__([number])
@@ -119,6 +114,11 @@ class Return(Node):
             super().__init__([])
         self.expr = expr
 
+
+class Transpose(Node):
+    def __init__(self, expr):
+        super().__init__([expr])
+        self.expr = expr
 
 class MatrixCreator(Node):
     def __init__(self, keyword, n):

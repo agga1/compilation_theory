@@ -1,5 +1,5 @@
 import ply.yacc as yacc
-from PrintTree import *
+from TreePrinter import *
 from scanner import tokens
 
 precedence = (
@@ -138,7 +138,7 @@ def p_create_matrix(p):
 
 def p_expression_transpose(p):
     """expression : expression "\'" """
-    p[0] = Expression(p[1])
+    p[0] = Expression(Transpose(p[1]))
 
 # NUMERICAL ------------------------------------------------
 def p_number(p):
@@ -202,7 +202,7 @@ def p_logical(p):
 # IF FOR WHILE -------------------------------------------------
 def p_statement_block(p):
     """statement_block : '{' statements '}' """
-    p[0] = StatementBlock(p[2])
+    p[0] = p[2]
 
 def p_if(p):
     """if : IF '(' logical ')' any_statement %prec IFX
