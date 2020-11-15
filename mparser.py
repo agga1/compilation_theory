@@ -35,7 +35,7 @@ def p_statements(p):
     if len(p) == 2:
         p[0] = Statements([p[1]])
     else:
-        p[0] = Statements(p[1].statements+[p[2]])
+        p[0] = Statements(p[1].children+[p[2]])
 
 def p_any_statements(p):
     """any_statement : no_semi_statement
@@ -163,7 +163,7 @@ def p_index_ref(p):
     if len(p) == 2:
         p[0] = IndexRef([p[1]])
     else:
-        p[0] = IndexRef(p[1].values+[p[3]])
+        p[0] = IndexRef(p[1].children+[p[3]])
 
 def p_matrix_part(p):
     """id_partial : ID '[' index_ref ']' """
@@ -186,7 +186,7 @@ def p_num_list_extend(p):
     if len(p) == 2:
         p[0] = ValueList([p[1]])
     else:
-        p[0] = ValueList(p[1].values+[p[3]])
+        p[0] = ValueList(p[1].children+[p[3]])
 
 # LOGICAL -------------------------------------------------
 def p_logical(p):

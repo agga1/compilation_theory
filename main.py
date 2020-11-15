@@ -4,7 +4,7 @@ import mparser
 if __name__ == '__main__':
     # -------from file
     try:
-        filename = sys.argv[1] if len(sys.argv) > 1 else "examples/ASTexample2.txt"
+        filename = sys.argv[1] if len(sys.argv) > 1 else "examples/ASTexample3.txt"
         file = open(filename, "r")
     except IOError:
         print("Cannot open {0} file".format(filename))
@@ -12,10 +12,10 @@ if __name__ == '__main__':
 
     text = file.read()
     parser = mparser.parser
-    prog = parser.parse(text)
-    prog.print_tree()
+    program = parser.parse(text)
+    program.print_tree()
 
-    # ------from console
+    # ------interactive console
     print("-----------------------------------")
     print("console mode -- type 'q' to quit ")
     parser = mparser.parser
