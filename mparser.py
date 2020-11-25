@@ -141,13 +141,13 @@ def p_expression_transpose(p):
     p[0] = Expression(Transpose(p[1]))
 
 # NUMERICAL ------------------------------------------------
-def p_number(p):
-    """number : INTNUM
-              | FLOAT """
-    if isinstance(p[1], int):
-        p[0] = Number(IntNum(p[1]))
-    else:
-        p[0] = Number(FloatNum(p[1]))
+def p_number_float(p):
+    """number : FLOAT """
+    p[0] = Number(FloatNum(p[1]))
+
+def p_number_int(p):
+    """number : INTNUM """
+    p[0] = Number(IntNum(p[1]))
 
 
 # INDEX_REF ------------------------------------------------

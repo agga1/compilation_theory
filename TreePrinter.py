@@ -1,6 +1,5 @@
 from ast import *
 
-
 def add_to_class(cls):
     def decorator(func):
         setattr(cls, func.__name__, func)
@@ -163,6 +162,5 @@ class TreePrinter:
     @add_to_class(For)
     def print_tree(self, indent=0):
         print_with_indent(indent, "FOR")
-        self.children[0].print_tree(indent+1)
-        self.children[1].print_tree(indent+1)
-        self.children[2].print_tree(indent + 1)
+        for ch in self.children:
+            ch.print_tree(indent+1)
