@@ -12,8 +12,11 @@ if __name__ == '__main__':
 
     text = file.read()
     parser = mparser.parser
-    program = parser.parse(text)
-    program.print_tree()
+    ast = parser.parse(text)
+    ast.print_tree()
+
+    # typeChecker = TypeChecker()
+    # typeChecker.visit(ast)
 
     # ------interactive console
     print("-----------------------------------")
