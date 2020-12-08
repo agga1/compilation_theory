@@ -59,6 +59,8 @@ class TypeChecker(NodeVisitor):
 
     def visit_IndexRef(self, node: IndexRef):
         self.generic_visit(node)
+        if len(node.values) > 2:
+            error(node.pos, "too many indexes given")
         if len(node.values) == 1 and isinstance(node.values[0],
                                                 Expression):  # assign constant value is reference is a constant
             node.type = node.values[0].type
