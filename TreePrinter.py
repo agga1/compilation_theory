@@ -19,7 +19,7 @@ class TreePrinter:
         pass
 
     @staticmethod
-    @add_to_classes(Program, Empty, Number, Expression, Statements, Statement)
+    @add_to_classes(Program, Empty, Number, Expression, Statements, Statement, ValueList)
     def print_tree(self, indent=0):
         """ silent print - no extra indentation, no messages, only recurse """
         for ch in self.children:
@@ -43,11 +43,11 @@ class TreePrinter:
         self.children[1].print_tree(indent+1)
 
     @staticmethod
-    @add_to_class(ValueList)
+    @add_to_class(List)
     def print_tree(self, indent=0):
         print_with_indent(indent, "VECTOR")
         for ch in self.children:
-            ch.print_tree(indent+1)
+            ch.print_tree(indent + 1)
 
     @staticmethod
     @add_to_class(IndexRef)
@@ -89,7 +89,7 @@ class TreePrinter:
         print_with_indent(indent, f"id: {self.children[0]}")
 
     @staticmethod
-    @add_to_class(String)
+    @add_to_class(StringM)
     def print_tree(self, indent=0):
         print_with_indent(indent, f"string: {self.children[0]}")
 
