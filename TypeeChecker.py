@@ -47,8 +47,15 @@ class TypeChecker(NodeVisitor):
         elif node.identifier.type not in [Type.STRING, Type.MATRIX, Type.VECTOR]:
             error(node.pos, f"cannot slice this element - element of type {node.identifier.type}")
         else:  # check if within size
-            self.visit(node.index_ref)
-            if node.index_ref.const_value is not None:  # index reference is a constant value
+            self.visit(node.index_ref) # errors for 3 or above
+            if len(node.index_ref.values) == 2:
+                if node.identifier.type != Type.MATRIX: # check if matrix
+                    error(node.pos, "too many indexes for 1 dimensional variable")
+                if node.index_ref.const_value is not None: # check if constants available
+                    row, col = node.index_ref.const_value
+                    if node.identifier.size[0] <= row or node.identifier.size[1] <= col:
+                        error(node.pos, f"index [{row}, {col}] out of bounds")
+            elif len(node.index_ref.values) == 1 and node.index_ref.const_value is not None:  # index reference is a constant value
                 ind = node.index_ref.const_value
                 if node.identifier.type == Type.STRING and node.identifier.size <= ind:
                     error(node.pos, "string index out of bounds")
@@ -61,11 +68,11 @@ class TypeChecker(NodeVisitor):
         self.generic_visit(node)
         if len(node.values) > 2:
             error(node.pos, "too many indexes given")
-        if len(node.values) == 1 and isinstance(node.values[0],
-                                                Expression):  # assign constant value is reference is a constant
-            node.type = node.values[0].type
-            node.size = node.values[0].size
+            return
+        if len(node.values) == 1 and node.values[0].const_value:  # assign constant value is reference is a constant
             node.const_value = node.values[0].const_value
+        if len(node.values) == 2 and node.values[0].const_value and node.values[1].const_value:
+            node.const_value = (node.values[0].const_value, node.values[1].const_value)
 
     def visit_List(self, node: List):
         if not node.value_list:
