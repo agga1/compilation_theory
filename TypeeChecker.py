@@ -31,6 +31,7 @@ class TypeChecker(NodeVisitor):
     def visit_Program(self, node: Program):
         self.visit_and_push_scope(node, "program")
 
+    # Lists, id --------------------------
     def visit_Identifier(self, node: Identifier):
         symbol = self.symbol_table.get(node.identifier)
         if symbol is not None:
@@ -64,39 +65,6 @@ class TypeChecker(NodeVisitor):
             node.size = node.values[0].size
             node.const_value = node.values[0].const_value
 
-    def visit_Assign(self, node: Assign):
-        self.visit(node.left)
-        self.visit(node.right)
-        if isinstance(node.left, Identifier):
-            if node.left.type == Type.NULL and node.op != '=':  # uninitialized 
-                    error(node.pos, "binary operation for uninitialized variable")
-            else:
-                if node.op == '=':
-                    node.left.type = node.right.type
-                    node.left.size = node.right.size
-                    self.put_symbol(node.left.identifier, node.right.type, node.right.size)
-
-                if node.op != '=':
-                    self.check_binop(node.left, node.right, node.op[1], node.pos)
-
-        else:
-            node.left.type = node.right.type
-            node.left.size = node.right.size
-
-    def visit_MatrixCreator(self, node: MatrixCreator):
-        self.visit(node.n)
-        node.type = Type.MATRIX
-        assert node.n.type == Type.VECTOR, "argument list should always be vector"
-        if node.n.size == 1 and node.n.values[0].type == Type.INTNUM:
-            node.size = ( node.n.values[0].const_value, node.n.values[0].const_value)  # argument check is at parser level !!
-        elif node.n.size == 2:
-            if node.n.values[0].type == node.n.values[1].type == Type.INTNUM:
-                node.size = (node.n.values[0].const_value, node.n.values[1].const_value)
-            else:
-                error(node.pos, f"function '{node.keyword}' takes only integers as argument")
-        else:
-            error(node.pos, f"function '{node.keyword}' takes 1 or 2 arguments, but {node.n.size} were given")
-
     def visit_List(self, node: List):
         if not node.value_list:
             node.type = Type.NULL
@@ -129,6 +97,39 @@ class TypeChecker(NodeVisitor):
             node.type = Type.VECTOR
 
     # operations --------------------------------------------------
+    def visit_Assign(self, node: Assign):
+        self.visit(node.left)
+        self.visit(node.right)
+        if isinstance(node.left, Identifier):
+            if node.left.type == Type.NULL and node.op != '=':  # uninitialized
+                    error(node.pos, "binary operation for uninitialized variable")
+            else:
+                if node.op == '=':
+                    node.left.type = node.right.type
+                    node.left.size = node.right.size
+                    self.put_symbol(node.left.identifier, node.right.type, node.right.size)
+
+                if node.op != '=':
+                    self.check_binop(node.left, node.right, node.op[1], node.pos)
+
+        else:
+            node.left.type = node.right.type
+            node.left.size = node.right.size
+
+    def visit_MatrixCreator(self, node: MatrixCreator):
+        self.visit(node.n)
+        node.type = Type.MATRIX
+        assert node.n.type == Type.VECTOR, "argument list should always be vector"
+        if node.n.size == 1 and node.n.values[0].type == Type.INTNUM:
+            node.size = ( node.n.values[0].const_value, node.n.values[0].const_value)  # argument check is at parser level !!
+        elif node.n.size == 2:
+            if node.n.values[0].type == node.n.values[1].type == Type.INTNUM:
+                node.size = (node.n.values[0].const_value, node.n.values[1].const_value)
+            else:
+                error(node.pos, f"function '{node.keyword}' takes only integers as argument")
+        else:
+            error(node.pos, f"function '{node.keyword}' takes 1 or 2 arguments, but {node.n.size} were given")
+
     def visit_Transpose(self, node: Transpose):
         self.visit(node.expr)
         if node.expr.type not in [Type.VECTOR, Type.MATRIX]:
@@ -160,7 +161,7 @@ class TypeChecker(NodeVisitor):
                         error(pos,
                               f"incompatible sizes ({left.size} ! {right.size}) for matrix operation '{op}' ")
 
-    # -------------------------------------------------------------
+    # Loops -------------------------------------------------------------
     def visit_For(self, node: For):
         self.visit(node.identifier)
         self.visit(node.mrange)
@@ -174,16 +175,15 @@ class TypeChecker(NodeVisitor):
 
     def visit_Break(self, node: Break):
         if not self.symbol_table.is_in_loop():
-            error(node.pos, "000000000000'break' outside loop")
+            error(node.pos, "'break' outside loop")
 
     def visit_Continue(self, node: Continue):
         if not self.symbol_table.is_in_loop():
-            error(node.pos, "000000000000'continue' outside loop")
+            error(node.pos, "'continue' outside loop")
 
     def visit_Empty(self, node: Empty):
         pass
 
-    # -------------------------------------------------------------------------------
     # -------------------------------------------------------------------------------
     # -------------------------------------------------------------------------------
     def visit_Expression(self, node: Expression):
