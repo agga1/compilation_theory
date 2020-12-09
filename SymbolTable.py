@@ -39,7 +39,7 @@ class SymbolTable(object):
                 return scope[name]
         return None
 
-    def is_in_loop(self):
+    def is_in_loop(self) -> bool:
         for name, _ in self.scopes:
             if name in ["while", "for"]:
                 return True
