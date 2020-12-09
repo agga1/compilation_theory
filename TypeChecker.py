@@ -128,10 +128,16 @@ class TypeChecker(NodeVisitor):
         self.visit(node.n)
         node.type = Type.MATRIX
         assert node.n.type == Type.VECTOR, "argument list should always be vector"
-        if node.n.size == 1 and node.n.values[0].type == Type.INTNUM:
-            node.size = ( node.n.values[0].const_value, node.n.values[0].const_value)  # argument check is at parser level !!
+        if node.n.size == 1:
+            arg = node.n.values[0]
+            if arg.type == Type.INTNUM:
+                node.size = (arg.const_value, arg.const_value)
+            else:
+                error(node.pos, f"function '{node.keyword}' takes only integers as argument, got {arg.type}")
         elif node.n.size == 2:
-            if node.n.values[0].type == node.n.values[1].type == Type.INTNUM:
+            if node.keyword == 'eye':
+                error(node.pos, "'eye' takes only 1 argument, 2 were given")
+            elif node.n.values[0].type == node.n.values[1].type == Type.INTNUM:
                 node.size = (node.n.values[0].const_value, node.n.values[1].const_value)
             else:
                 error(node.pos, f"function '{node.keyword}' takes only integers as argument")

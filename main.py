@@ -1,6 +1,6 @@
 import sys
 import mparser
-from TypeeChecker import TypeChecker
+from TypeChecker import TypeChecker
 
 if __name__ == '__main__':
     # -------from file
