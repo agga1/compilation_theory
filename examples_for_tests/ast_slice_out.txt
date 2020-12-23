@@ -1,0 +1,18 @@
+=
+|  id: a
+|  VECTOR
+|  |  int: 1
+|  |  int: 2
+|  |  int: 3
+=
+|  REF
+|  |  id: a
+|  |  index_refs
+|  |  |  int: 1
+|  int: 4
+=
+|  id: b
+|  REF
+|  |  id: a
+|  |  index_refs
+|  |  |  int: 2

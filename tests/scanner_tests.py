@@ -25,7 +25,7 @@ class TestScanner(unittest.TestCase):
         text = get_text("../examples_for_tests/scanner1.txt")
         exp_result = get_text("../examples_for_tests/scanner1_out.txt")
         actual = get_lexer_result(text)
-        self.assertEqual(actual, exp_result, "Scanner failed")
+        self.assertEqual(exp_result, actual,  "Scanner failed")
 
 
 if __name__ == '__main__':
