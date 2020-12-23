@@ -3,31 +3,29 @@ import unittest
 import scanner
 
 
+def get_text(filename):
+    with open(filename, "r") as file:
+        text = file.read()
+    return text
+
+def get_lexer_result(text):
+    lexer = scanner.lexer
+    lexer.input(text)
+    result = ""
+    while True:
+        tok = lexer.token()
+        if not tok:
+            break  # No more input
+        result += ("(%d): %s(%s)\n" % (tok.lineno, tok.type, tok.value))
+    return result
+
 class TestScanner(unittest.TestCase):
 
     def test_whole(self):
-        test_name = "../examples/example_whole.txt"
-        answer_name = "../examples/answer_whole.txt"
-        try:
-            test_file = open(test_name, "r")
-            text = test_file.read()
-            test_file.close()
-            answer_file = open(answer_name, "r")
-            answer = answer_file.read()
-            answer_file.close()
-        except IOError:
-            print("Cannot open files")
-            sys.exit(0)
-
-        lexer = scanner.lexer
-        lexer.input(text)  # Give the lexer some input
-        ans = ""
-        while True:
-            tok = lexer.token()
-            if not tok:
-                break  # No more input
-            ans += ("(%d): %s(%s)\n" % (tok.lineno, tok.type, tok.value))
-        self.assertEqual(ans, answer, "Should be 6")
+        text = get_text("../examples_for_tests/scanner1.txt")
+        exp_result = get_text("../examples_for_tests/scanner1_out.txt")
+        actual = get_lexer_result(text)
+        self.assertEqual(actual, exp_result, "Scanner failed")
 
 
 if __name__ == '__main__':
