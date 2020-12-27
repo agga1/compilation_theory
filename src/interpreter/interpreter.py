@@ -78,6 +78,12 @@ class Interpreter(object):
             ref_list.append(self.visit(ref))
         return ref_list
 
+    @when(Range)
+    def visit(self, node: Range): # todo check if working
+        val = range(self.visit(node.fr), self.visit(node.to))
+        print("range:", list(val))
+        return val
+
     @when(List)
     def visit(self, node: List):
         return self.visit(node.value_list)
@@ -97,32 +103,39 @@ class Interpreter(object):
         r1 = self.visit(node.left)
         r2 = self.visit(node.right)
         # try sth smarter than:
-        if(node.op=='+'):
+        if(node.op=='+'): # todo more operations
             return r1+r2
         # elsif(node.op=='-') ...
         # but do not use python eval
 
     @when(Assign)
     def visit(self, node: Assign):
-        print("Assign")
-        self.visit(node.left)
-        val = self.visit(node.right)
+        old_val = self.visit(node.left)
+        new_val = self.visit(node.right)
+        new_val = self.eval_assign(old_val, new_val, node.op)
         if isinstance(node.left, Identifier):
-            print("assigning", node.left.identifier, "to", val)
-            self.memory_stack.set(node.left.identifier, val)
-        else: # todo assign partialId
-            pass
+            print("assigning", node.left.identifier, "to", new_val)
+            self.memory_stack.set(node.left.identifier, new_val)
+        elif isinstance(node.left, PartialId):
+            updated_id = self.visit(node.left.identifier)
+            refs = self.visit(node.left.index_ref)
+            if len(refs) == 1:
+                updated_id[refs[0]] = new_val
+            else:
+                updated_id[refs[0]][refs[1]] = new_val
+            print("assigning", node.left.identifier.identifier, "to", updated_id)
+            self.memory_stack.set(node.left.identifier.identifier, updated_id)
 
-    # @when(ast.Assignment)
-    # def visit(self, node):
-    # #
-    # #
-    #
-    # # simplistic while loop interpretation
-    # @when(ast.WhileInstr)
-    # def visit(self, node):
-    #     r = None
-    #     while node.cond.accept(self):
-    #         r = node.body.accept(self)
-    #     return r
+    def eval_assign(self, left, right, op):
+        if op == "=":
+            return right
+        if op == '+=':
+            return left + right
+        if op == '-=':
+            return left - right
+        if op == '*=':
+            return left*right
+        if op == '/=':
+            return left/right
+
 

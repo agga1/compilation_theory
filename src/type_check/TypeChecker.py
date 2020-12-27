@@ -133,7 +133,7 @@ class TypeChecker(NodeVisitor):
                     self.put_symbol(node.left.identifier, node.right.type, node.right.size)
 
                 if node.op != '=':
-                    self.check_binop(node.left, node.right, node.op[1], node.pos)
+                    self.check_binop(node.left, node.right, node.op[1], node.pos, node.type)
         else:
             node.left.type = node.right.type
             node.left.size = node.right.size
