@@ -11,6 +11,10 @@ class Type(Enum):
     NULL = auto()
     UNKNOWN = auto()
 
+    @staticmethod
+    def is_number(mtype):
+        return mtype in [Type.FLOAT, Type.INTNUM]
+
 class Symbol:
     def __init__(self, name, mtype, size):
         self.name = name

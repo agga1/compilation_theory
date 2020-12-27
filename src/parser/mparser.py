@@ -1,6 +1,7 @@
 import ply.yacc as yacc
-from TreePrinter import *
-from scanner import tokens
+from src.astt.tree_printer import *
+from src.scanner.scanner import tokens
+tokens  # added to force scanner.tokens dependency
 
 precedence = (
     ('nonassoc', 'IFX'),
@@ -27,6 +28,10 @@ def p_start(p):
             | empty
              """
     p[0] = Program(p.lexer.lineno, p[1])
+
+def p_empty(p):
+    """empty :"""
+    p[0] = Empty(p.lexer.lineno)
 
 def p_statements(p):
     """statements : any_statement
@@ -228,9 +233,7 @@ def p_for(p):
     """
     p[0] = For(p.lexer.lineno, Identifier(p.lexer.lineno, p[2]), p[4], p[5])
 
-def p_empty(p):
-    """empty :"""
-    p[0] = Empty(p.lexer.lineno)
+
 
 # ERROR -------------------------------------------------
 def p_error(p):

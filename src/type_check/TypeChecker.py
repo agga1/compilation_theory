@@ -1,5 +1,5 @@
-from type_check.SymbolTable import SymbolTable, Symbol
-from ast import *
+from src.type_check.SymbolTable import SymbolTable, Symbol
+from src.astt.ast import *
 
 
 class NodeVisitor(object):
@@ -23,9 +23,14 @@ class TypeChecker(NodeVisitor):
         super().__init__()
         self.all_correct = True  # set to False whenever self.error() is called
 
-    def check(self, ast) -> bool:  # check for any type errors (True = no errors)
+    def check(self, ast, verbose=False) -> bool:  # check for any type errors (True = no errors)
         self.all_correct = True
         self.visit(ast)
+        if verbose:
+            if self.all_correct:
+                print("[TypeCheck]: OK no errors")
+            else:
+                print("[TypeCheck]: ERROR exists, do not interpret")
         return self.all_correct
 
     def put_symbol(self, name, symbol_type, symbol_size=None):
@@ -161,27 +166,34 @@ class TypeChecker(NodeVisitor):
     def visit_BinOp(self, node: BinOp):
         self.visit(node.left)
         self.visit(node.right)
-        node.type = node.left.type
-        node.size = node.left.size
-        self.check_binop(node.left, node.right, node.op, node.pos)
-
-    def check_binop(self, left, right, op, pos):
-        if left.type != right.type:
-            self.error(pos, f"binop type mismatch: {left.type} ! {right.type}")
+        binop_type = self.get_binop_type(node.left, node.right)
+        if binop_type is None:
+            self.error(node.pos, f"binop type mismatch: {node.left.type} ! {node.right.type}")
         else:
-            types = left.type
-            if op in ['.+', './', '.*', '.-'] and types not in [Type.VECTOR, Type.MATRIX]:
-                self.error(pos, f"operation '{op}' undefined for type {types}")
-            if left.type == Type.VECTOR and left.size != right.size:
-                self.error(pos, f"binop on vectors with different sizes: {left.size} ! {right.size}")
-            if left.type == Type.MATRIX:
-                if op in ['-', '+', '.+', './', '.*', '.-'] and left.size != right.size:
+            node.type = binop_type
+            node.size = node.left.size
+            self.check_binop(node.left, node.right, node.op, node.pos, node.type)
+
+    def get_binop_type(self, left, right):
+        if left.type == right.type:
+            return left.type
+        elif Type.is_number(left.type) and Type.is_number(right.type):  # different types, but nomerical
+            return Type.FLOAT
+        return None
+
+    def check_binop(self, left, right, op, pos, types):
+        if op in ['.+', './', '.*', '.-'] and types not in [Type.VECTOR, Type.MATRIX]:
+            self.error(pos, f"operation '{op}' undefined for type {types}")
+        if left.type == Type.VECTOR and left.size != right.size:
+            self.error(pos, f"binop on vectors with different sizes: {left.size} ! {right.size}")
+        if left.type == Type.MATRIX:
+            if op in ['-', '+', '.+', './', '.*', '.-'] and left.size != right.size:
+                self.error(pos,
+                      f"incompatible sizes ({left.size} ! {right.size}) for elementwise operation '{op}' ")
+            if op in ['*', '/']:
+                if left.size[1] != right.size[0]:
                     self.error(pos,
-                          f"incompatible sizes ({left.size} ! {right.size}) for elementwise operation '{op}' ")
-                if op in ['*', '/']:
-                    if left.size[1] != right.size[0]:
-                        self.error(pos,
-                              f"incompatible sizes ({left.size} ! {right.size}) for matrix operation '{op}' ")
+                          f"incompatible sizes ({left.size} ! {right.size}) for matrix operation '{op}' ")
 
     # Loops -------------------------------------------------------------
     def visit_For(self, node: For):

@@ -1,7 +1,8 @@
 # object oriented version
 
 import sys
-import scanner  # scanner.py is a file you create, (it is not an external library)
+from src import scanner
+
 if __name__ == '__main__':
     # -------from file
     try:

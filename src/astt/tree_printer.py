@@ -1,4 +1,4 @@
-from ast import *
+from src.astt.ast import *
 
 def add_to_class(cls):
     def decorator(func):

@@ -1,4 +1,4 @@
-from type_check.SymbolTable import Type
+from src.type_check.SymbolTable import Type
 
 
 class Node:
@@ -10,7 +10,7 @@ class Node:
         self.const_value = None
 
     def __str__(self):
-        return f"type {self.type} size {self.size} name {self.__class__.__name__}"
+        return f" {self.__class__.__name__} (type: {self.type} size: {self.size})"
 
 
 class Program(Node):
@@ -59,7 +59,7 @@ class StringM(Node):
         self.string = string[1:-1]
 
 class Identifier(Node):
-    def __init__(self, pos, identifier):
+    def __init__(self, pos, identifier: StringM):
         super().__init__(pos, [identifier])
         self.identifier = identifier
 
@@ -121,7 +121,7 @@ class BinOp(Node):
         self.right = right
 
 class Assign(Node):
-    def __init__(self, pos,  left, op, right):
+    def __init__(self, pos,  left, op, right: Expression):
         super().__init__(pos, [left, op, right])
         self.left = left
         self.op = op

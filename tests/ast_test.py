@@ -1,5 +1,4 @@
 import unittest
-import mparser
 import io
 from contextlib import redirect_stdout
 from tests.scanner_tests import get_text
@@ -7,7 +6,7 @@ from tests.scanner_tests import get_text
 
 def get_ast(text):
     with io.StringIO() as buf, redirect_stdout(buf):
-        parser = mparser.parser
+        parser = parser.parser
         ast = parser.parse(text)
         ast.print_tree()
         output = buf.getvalue()

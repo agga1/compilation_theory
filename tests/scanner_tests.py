@@ -1,6 +1,5 @@
-import sys
 import unittest
-import scanner
+from src import scanner
 
 
 def get_text(filename):
