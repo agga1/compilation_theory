@@ -1,4 +1,4 @@
-from SymbolTable import SymbolTable, Symbol
+from type_check.SymbolTable import SymbolTable, Symbol
 from ast import *
 
 
@@ -18,6 +18,15 @@ class NodeVisitor(object):
 
 
 class TypeChecker(NodeVisitor):
+
+    def __init__(self):
+        super().__init__()
+        self.all_correct = True  # set to False whenever self.error() is called
+
+    def check(self, ast) -> bool:  # check for any type errors (True = no errors)
+        self.all_correct = True
+        self.visit(ast)
+        return self.all_correct
 
     def put_symbol(self, name, symbol_type, symbol_size=None):
         self.symbol_table.put(name, Symbol(name, symbol_type, symbol_size))
@@ -43,31 +52,31 @@ class TypeChecker(NodeVisitor):
     def visit_PartialId(self, node: PartialId):
         self.visit(node.identifier)
         if node.identifier.type == Type.NULL:
-            error(node.pos, "accessing uninitialized memory")
+            self.error(node.pos, "accessing uninitialized memory")
         elif node.identifier.type not in [Type.STRING, Type.MATRIX, Type.VECTOR]:
-            error(node.pos, f"cannot slice this element - element of type {node.identifier.type}")
+            self.error(node.pos, f"cannot slice this element - element of type {node.identifier.type}")
         else:  # check if within size
             self.visit(node.index_ref) # errors for 3 or above
             if len(node.index_ref.values) == 2:
                 if node.identifier.type != Type.MATRIX: # check if matrix
-                    error(node.pos, "too many indexes for 1 dimensional variable")
+                    self.error(node.pos, "too many indexes for 1 dimensional variable")
                 if node.index_ref.const_value is not None: # check if constants available
                     row, col = node.index_ref.const_value
                     if node.identifier.size[0] <= row or node.identifier.size[1] <= col:
-                        error(node.pos, f"index [{row}, {col}] out of bounds")
+                        self.error(node.pos, f"index [{row}, {col}] out of bounds")
             elif len(node.index_ref.values) == 1 and node.index_ref.const_value is not None:  # index reference is a constant value
                 ind = node.index_ref.const_value
                 if node.identifier.type == Type.STRING and node.identifier.size <= ind:
-                    error(node.pos, "string index out of bounds")
+                    self.error(node.pos, "string index out of bounds")
                 if node.identifier.type == Type.VECTOR and node.identifier.size <= ind:
-                    error(node.pos, "vector index out of bounds")
+                    self.error(node.pos, "vector index out of bounds")
                 if node.identifier.type == Type.MATRIX and node.identifier.size[0] <= ind:
-                    error(node.pos, "matrix index out of bounds")
+                    self.error(node.pos, "matrix index out of bounds")
 
     def visit_IndexRef(self, node: IndexRef):
         self.generic_visit(node)
         if len(node.values) > 2:
-            error(node.pos, "too many indexes given")
+            self.error(node.pos, "too many indexes given")
             return
         if len(node.values) == 1 and node.values[0].const_value:  # assign constant value is reference is a constant
             node.const_value = node.values[0].const_value
@@ -91,9 +100,9 @@ class TypeChecker(NodeVisitor):
             length = node.values[0].size
             for ch in node.values:
                 if ch.type != Type.VECTOR:
-                    error(node.pos, "Matrix row is not a vector!")
+                    self.error(node.pos, "Matrix row is not a vector!")
                 if ch.size != length:
-                    error(node.pos, f"Matrix row bad size ({ch.size} instead of {length})")
+                    self.error(node.pos, f"Matrix row bad size ({ch.size} instead of {length})")
             node.type = Type.MATRIX
             node.size = (len(node.values), length)
 
@@ -101,7 +110,7 @@ class TypeChecker(NodeVisitor):
         self.visit(node.fr)
         self.visit(node.to)
         if node.fr.type != Type.INTNUM or node.to.type != Type.INTNUM:
-            error(node.pos, f"range must be defined with integers, found {node.fr.type}, {node.to.type}")
+            self.error(node.pos, f"range must be defined with integers, found {node.fr.type}, {node.to.type}")
         else:
             node.type = Type.VECTOR
 
@@ -111,7 +120,7 @@ class TypeChecker(NodeVisitor):
         self.visit(node.right)
         if isinstance(node.left, Identifier):
             if node.left.type == Type.NULL and node.op != '=':  # uninitialized
-                    error(node.pos, "binary operation for uninitialized variable")
+                    self.error(node.pos, "binary operation for uninitialized variable")
             else:
                 if node.op == '=':
                     node.left.type = node.right.type
@@ -133,21 +142,21 @@ class TypeChecker(NodeVisitor):
             if arg.type == Type.INTNUM:
                 node.size = (arg.const_value, arg.const_value)
             else:
-                error(node.pos, f"function '{node.keyword}' takes only integers as argument, got {arg.type}")
+                self.error(node.pos, f"function '{node.keyword}' takes only integers as argument, got {arg.type}")
         elif node.n.size == 2:
             if node.keyword == 'eye':
-                error(node.pos, "'eye' takes only 1 argument, 2 were given")
+                self.error(node.pos, "'eye' takes only 1 argument, 2 were given")
             elif node.n.values[0].type == node.n.values[1].type == Type.INTNUM:
                 node.size = (node.n.values[0].const_value, node.n.values[1].const_value)
             else:
-                error(node.pos, f"function '{node.keyword}' takes only integers as argument")
+                self.error(node.pos, f"function '{node.keyword}' takes only integers as argument")
         else:
-            error(node.pos, f"function '{node.keyword}' takes 1 or 2 arguments, but {node.n.size} were given")
+            self.error(node.pos, f"function '{node.keyword}' takes 1 or 2 arguments, but {node.n.size} were given")
 
     def visit_Transpose(self, node: Transpose):
         self.visit(node.expr)
         if node.expr.type not in [Type.VECTOR, Type.MATRIX]:
-            error(node.pos, f"cannot transpose variable of type {node.expr.type}")
+            self.error(node.pos, f"cannot transpose variable of type {node.expr.type}")
 
     def visit_BinOp(self, node: BinOp):
         self.visit(node.left)
@@ -156,23 +165,22 @@ class TypeChecker(NodeVisitor):
         node.size = node.left.size
         self.check_binop(node.left, node.right, node.op, node.pos)
 
-    @staticmethod
-    def check_binop(left, right, op, pos):
+    def check_binop(self, left, right, op, pos):
         if left.type != right.type:
-            error(pos, f"binop type mismatch: {left.type} ! {right.type}")
+            self.error(pos, f"binop type mismatch: {left.type} ! {right.type}")
         else:
             types = left.type
             if op in ['.+', './', '.*', '.-'] and types not in [Type.VECTOR, Type.MATRIX]:
-                error(pos, f"operation '{op}' undefined for type {types}")
+                self.error(pos, f"operation '{op}' undefined for type {types}")
             if left.type == Type.VECTOR and left.size != right.size:
-                error(pos, f"binop on vectors with different sizes: {left.size} ! {right.size}")
+                self.error(pos, f"binop on vectors with different sizes: {left.size} ! {right.size}")
             if left.type == Type.MATRIX:
                 if op in ['-', '+', '.+', './', '.*', '.-'] and left.size != right.size:
-                    error(pos,
+                    self.error(pos,
                           f"incompatible sizes ({left.size} ! {right.size}) for elementwise operation '{op}' ")
                 if op in ['*', '/']:
                     if left.size[1] != right.size[0]:
-                        error(pos,
+                        self.error(pos,
                               f"incompatible sizes ({left.size} ! {right.size}) for matrix operation '{op}' ")
 
     # Loops -------------------------------------------------------------
@@ -189,11 +197,11 @@ class TypeChecker(NodeVisitor):
 
     def visit_Break(self, node: Break):
         if not self.symbol_table.is_in_loop():
-            error(node.pos, "'break' outside loop")
+            self.error(node.pos, "'break' outside loop")
 
     def visit_Continue(self, node: Continue):
         if not self.symbol_table.is_in_loop():
-            error(node.pos, "'continue' outside loop")
+            self.error(node.pos, "'continue' outside loop")
 
     def visit_Empty(self, node: Empty):
         pass
@@ -236,6 +244,6 @@ class TypeChecker(NodeVisitor):
         node.size = len(node.string)
         node.const_value = node.string
 
-
-def error(pos, message):
-    print(f"[line {pos}]: {message}")
+    def error(self, pos, message):
+        print(f"[line {pos}]: {message}")
+        self.all_correct = False

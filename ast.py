@@ -1,4 +1,4 @@
-from SymbolTable import Type
+from type_check.SymbolTable import Type
 
 
 class Node:
