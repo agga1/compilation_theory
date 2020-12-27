@@ -133,7 +133,7 @@ class TypeChecker(NodeVisitor):
                     self.put_symbol(node.left.identifier, node.right.type, node.right.size)
 
                 if node.op != '=':
-                    self.check_binop(node.left, node.right, node.op[1], node.pos, node.type)
+                    self._check_binop(node.left, node.right, node.op[1], node.pos, node.type)
         else:
             node.left.type = node.right.type
             node.left.size = node.right.size
@@ -162,26 +162,30 @@ class TypeChecker(NodeVisitor):
         self.visit(node.expr)
         if node.expr.type not in [Type.VECTOR, Type.MATRIX]:
             self.error(node.pos, f"cannot transpose variable of type {node.expr.type}")
+        node.type = node.expr.type
+        node.size = node.expr.size
+        if node.type == Type.MATRIX:
+            node.size = node.size[1], node.size[0]
 
     def visit_BinOp(self, node: BinOp):
         self.visit(node.left)
         self.visit(node.right)
-        binop_type = self.get_binop_type(node.left, node.right)
+        binop_type = self._get_binop_type(node.left, node.right)
         if binop_type is None:
             self.error(node.pos, f"binop type mismatch: {node.left.type} ! {node.right.type}")
         else:
             node.type = binop_type
             node.size = node.left.size
-            self.check_binop(node.left, node.right, node.op, node.pos, node.type)
+            self._check_binop(node.left, node.right, node.op, node.pos, node.type)
 
-    def get_binop_type(self, left, right):
+    def _get_binop_type(self, left, right):
         if left.type == right.type:
             return left.type
         elif Type.is_number(left.type) and Type.is_number(right.type):  # different types, but nomerical
             return Type.FLOAT
         return None
 
-    def check_binop(self, left, right, op, pos, types):
+    def _check_binop(self, left, right, op, pos, types):
         if op in ['.+', './', '.*', '.-'] and types not in [Type.VECTOR, Type.MATRIX]:
             self.error(pos, f"operation '{op}' undefined for type {types}")
         if left.type == Type.VECTOR and left.size != right.size:

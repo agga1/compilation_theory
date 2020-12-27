@@ -1,7 +1,10 @@
+import numpy
+
 from src.astt.ast import *
 from src.interpreter.memory import *
 from src.interpreter.visit import *
 import sys
+from src.interpreter.operators import operations
 
 sys.setrecursionlimit(10000)
 
@@ -23,12 +26,10 @@ class Interpreter(object):
     # --------------------------------------------   statements (no return value) -----
     @when(Program)
     def visit(self, node: Program):
-        # print("Program")
         self.visit(node.statements)
 
     @when(Statements)
     def visit(self, node: Statements):
-        # print("Statements")
         for st in node.statements:
             self.visit(st)
 
@@ -86,7 +87,10 @@ class Interpreter(object):
 
     @when(List)
     def visit(self, node: List):
-        return self.visit(node.value_list)
+        val = self.visit(node.value_list)
+        # if node.type == Type.MATRIX:
+        #     return numpy.array(val)
+        return val
 
     @when(ValueList)
     def visit(self, node: ValueList):
@@ -99,20 +103,14 @@ class Interpreter(object):
 
     @when(BinOp)
     def visit(self, node):
-        print("\t evaluating binop")
-        r1 = self.visit(node.left)
-        r2 = self.visit(node.right)
-        # try sth smarter than:
-        if(node.op=='+'): # todo more operations
-            return r1+r2
-        # elsif(node.op=='-') ...
-        # but do not use python eval
+        left_val, right_val = self.visit(node.left), self.visit(node.right)
+        return operations[node.op](left_val, right_val)
 
     @when(Assign)
     def visit(self, node: Assign):
         old_val = self.visit(node.left)
-        new_val = self.visit(node.right)
-        new_val = self.eval_assign(old_val, new_val, node.op)
+        right_val = self.visit(node.right)
+        new_val = operations[node.op](old_val, right_val)
         if isinstance(node.left, Identifier):
             print("assigning", node.left.identifier, "to", new_val)
             self.memory_stack.set(node.left.identifier, new_val)
@@ -126,16 +124,52 @@ class Interpreter(object):
             print("assigning", node.left.identifier.identifier, "to", updated_id)
             self.memory_stack.set(node.left.identifier.identifier, updated_id)
 
-    def eval_assign(self, left, right, op):
-        if op == "=":
-            return right
-        if op == '+=':
-            return left + right
-        if op == '-=':
-            return left - right
-        if op == '*=':
-            return left*right
-        if op == '/=':
-            return left/right
+
+    @when(MatrixCreator)
+    def visit(self, node: MatrixCreator):
+        shape = self.visit(node.n)
+        if node.keyword == "eye":
+            return numpy.eye(shape[0])
+        if len(shape) == 1:
+            shape = (shape[0], shape[0])
+        if node.keyword == "ones":
+            return numpy.ones(shape)
+        elif node.keyword == "zeros":
+            return numpy.zeros(shape)
+        return None
+
+    @when(Transpose)
+    def visit(self, node: Transpose):
+        matrix = self.visit(node.expr)
+        return numpy.transpose(matrix)
+
+    @when(For)
+    def visit(self, node: For):
+        pass
+
+    @when(While)
+    def visit(self, node: While):
+        pass
+
+    @when(Break)
+    def visit(self, node: Break):
+        pass
+
+    @when(Continue)
+    def visit(self, node: Continue):
+        pass
+
+    @when(Logical)
+    def visit(self, node: Logical):
+        left = self.visit(node.left)
+        right = self.visit(node.right)
+        return operations[node.cmp](left, right)
+
+    @when(UMinus)
+    def visit(self, node: UMinus):
+        return -1*self.visit(node.expr)
+
+
+
 
 
