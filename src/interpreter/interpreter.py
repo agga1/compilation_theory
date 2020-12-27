@@ -58,6 +58,12 @@ class Interpreter(object):
     def visit(self, node: StringM):
         return node.const_value
 
+    @when(Logical)
+    def visit(self, node: Logical):
+        left = self.visit(node.left)
+        right = self.visit(node.right)
+        return operations[node.cmp](left, right)
+
     @when(Identifier)
     def visit(self, node: Identifier):
         val = self.memory_stack.get(node.identifier)
@@ -143,12 +149,34 @@ class Interpreter(object):
         matrix = self.visit(node.expr)
         return numpy.transpose(matrix)
 
+    @when(If)
+    def visit(self, node: If):
+        self.memory_stack.push(Memory('if'))
+        cond = self.visit(node.logical)
+        if cond:
+            print("running statements")
+            self.visit(node.statement)
+        else:
+            print("cond false")
+            if node.else_block is not None:
+                self.visit(node.else_block)
+        self.memory_stack.pop()
+
+    @when(ElseBlock)
+    def visit(self, node: ElseBlock):
+        self.memory_stack.push(Memory('else'))
+        self.visit(node.statement)
+        self.memory_stack.pop()
+
     @when(For)
     def visit(self, node: For):
-        pass
+        self.memory_stack.push(Memory('for'))
+        self.memory_stack.pop()
 
     @when(While)
     def visit(self, node: While):
+        self.memory_stack.push(Memory('while'))
+        self.memory_stack.pop()
         pass
 
     @when(Break)
@@ -159,11 +187,6 @@ class Interpreter(object):
     def visit(self, node: Continue):
         pass
 
-    @when(Logical)
-    def visit(self, node: Logical):
-        left = self.visit(node.left)
-        right = self.visit(node.right)
-        return operations[node.cmp](left, right)
 
     @when(UMinus)
     def visit(self, node: UMinus):
