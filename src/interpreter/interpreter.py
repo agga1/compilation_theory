@@ -195,6 +195,15 @@ class Interpreter(object):
     @when(While)
     def visit(self, node: While):
         self.memory_stack.push(Memory('while'))
+        status = self.visit(node.logical)
+        while status:
+            try:
+                self.visit(node.statement)
+                status = self.visit(node.logical)
+            except BreakException:
+                break
+            except ContinueException:
+                continue
         self.memory_stack.pop()
         pass
 
