@@ -93,11 +93,14 @@ class TypeChecker(NodeVisitor):
             node.type = Type.NULL
         else:
             self.visit(node.value_list)
+            self._check_list_types(node.value_list)
             node.type = node.value_list.type
             node.size = node.value_list.size
 
-    def visit_ValueList(self, node: ValueList):
+    def visit_ValueList(self, node: ValueList): # do not check type compatibility here - e.g. value lists do not have to have the same type
         self.generic_visit(node)
+
+    def _check_list_types(self, node: ValueList):
         if node.values[0].type not in [Type.VECTOR, Type.MATRIX]:
             node.type = Type.VECTOR
             node.size = len(node.values)
