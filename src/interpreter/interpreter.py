@@ -1,6 +1,7 @@
 import numpy
 
 from src.astt.ast import *
+from src.interpreter.exceptions import BreakException, ContinueException
 from src.interpreter.memory import *
 from src.interpreter.visit import *
 import sys
@@ -42,6 +43,11 @@ class Interpreter(object):
     def visit(self, node: Empty):
         print("Empty")
 
+    @when(Print)
+    def visit(self, node: Print):
+        vals = self.visit(node.value_list)
+        for val in vals:
+            print("[printing]: ",val)
     # --------------------------------------------  expressions ---------------------------
 
     @when(Expression)
@@ -63,6 +69,10 @@ class Interpreter(object):
         left = self.visit(node.left)
         right = self.visit(node.right)
         return operations[node.cmp](left, right)
+
+    @when(UMinus)
+    def visit(self, node: UMinus):
+        return -1*self.visit(node.expr)
 
     @when(Identifier)
     def visit(self, node: Identifier):
@@ -87,15 +97,13 @@ class Interpreter(object):
 
     @when(Range)
     def visit(self, node: Range): # todo check if working
-        val = range(self.visit(node.fr), self.visit(node.to))
-        print("range:", list(val))
+        val = (self.visit(node.fr), self.visit(node.to))
+        print("range:", val)
         return val
 
     @when(List)
     def visit(self, node: List):
         val = self.visit(node.value_list)
-        # if node.type == Type.MATRIX:
-        #     return numpy.array(val)
         return val
 
     @when(ValueList)
@@ -149,12 +157,12 @@ class Interpreter(object):
         matrix = self.visit(node.expr)
         return numpy.transpose(matrix)
 
+    # ------------------------- scope functions ----------------------------------------
     @when(If)
     def visit(self, node: If):
         self.memory_stack.push(Memory('if'))
         cond = self.visit(node.logical)
         if cond:
-            print("running statements")
             self.visit(node.statement)
         else:
             print("cond false")
@@ -171,7 +179,18 @@ class Interpreter(object):
     @when(For)
     def visit(self, node: For):
         self.memory_stack.push(Memory('for'))
+        mrange = self.visit(node.mrange)
+        range_id = node.identifier.identifier
+        for i in range(*mrange):
+            try:
+                self.memory_stack.set(range_id, i)
+                self.visit(node.statement)
+            except BreakException:
+                break
+            except ContinueException:
+                continue
         self.memory_stack.pop()
+
 
     @when(While)
     def visit(self, node: While):
@@ -181,16 +200,13 @@ class Interpreter(object):
 
     @when(Break)
     def visit(self, node: Break):
-        pass
+        raise BreakException()
 
     @when(Continue)
     def visit(self, node: Continue):
-        pass
+        raise ContinueException()
 
 
-    @when(UMinus)
-    def visit(self, node: UMinus):
-        return -1*self.visit(node.expr)
 
 
 

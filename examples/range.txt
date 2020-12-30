@@ -1,0 +1,6 @@
+x = 10;
+print x;
+for k=1:4 {
+    if(k==1) continue;
+    if(k < 3) print k;
+}

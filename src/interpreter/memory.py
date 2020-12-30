@@ -1,3 +1,12 @@
+from src.type_check.SymbolTable import Symbol
+
+
+class SymbolAssigned(Symbol):
+    def __init__(self, value, name, mtype, size):
+        super().__init__(name, mtype, size)
+        self.value = value
+
+
 class Memory:
 
     def __init__(self, name):  # memory name
@@ -12,6 +21,9 @@ class Memory:
 
     def put(self, name, value):  # puts into memory current value of variable <name>
         self.symbols[name] = value
+
+    def __str__(self):
+        return f"<{self.name}>:\n{str(self.symbols)}"
 
 class MemoryStack:
 
@@ -40,6 +52,12 @@ class MemoryStack:
 
     def pop(self):  # pops the top memory from the stack
         self.stack.pop()
+
+    def __str__(self):
+        ans = ""
+        for m in self.stack:
+            ans += "\n" + str(m)
+        return ans
 
     def _get_memory_with_name(self, name):
         for mem in reversed(self.stack):

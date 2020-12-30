@@ -16,6 +16,8 @@ operations = {"+": operator.add,
               ">=": operator.ge,
               "<=": operator.le,
               "==": operator.eq,
+              "<": operator.lt,
+              ">": operator.gt,
               }
 
 
