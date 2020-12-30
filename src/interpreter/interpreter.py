@@ -36,7 +36,6 @@ class Interpreter(object):
 
     @when(Statement)
     def visit(self, node: Statement):
-        print("\n--st--")
         self.visit(node.statement)
 
     @when(Empty)
@@ -53,7 +52,6 @@ class Interpreter(object):
     @when(Expression)
     def visit(self, node: Expression):
         asd = self.visit(node.expression) # todo refactor nicely
-        print("Expression: ", asd)
         return asd
 
     @when(Number)
@@ -77,7 +75,7 @@ class Interpreter(object):
     @when(Identifier)
     def visit(self, node: Identifier):
         val = self.memory_stack.get(node.identifier)
-        print(node.identifier, ":", val)
+        # print(node.identifier, ":", val)
         return val
 
     @when(PartialId)
@@ -85,14 +83,17 @@ class Interpreter(object):
         curr_val = self.memory_stack.get(node.identifier.identifier)
         refs = self.visit(node.index_ref)
         for ref in refs:
-            curr_val = curr_val[ref] # todo range reference
+            curr_val = curr_val[ref]
         return curr_val
 
     @when(IndexRef)
     def visit(self, node: IndexRef):
         ref_list = []
         for ref in node.values:
-            ref_list.append(self.visit(ref))
+            ref_val = self.visit(ref)
+            if isinstance(ref, Range): # convert Range to Slice todo Type. ?
+                ref_val = slice(ref_val[0], ref_val[1])
+            ref_list.append(ref_val)
         return ref_list
 
     @when(Range)
@@ -165,7 +166,6 @@ class Interpreter(object):
         if cond:
             self.visit(node.statement)
         else:
-            print("cond false")
             if node.else_block is not None:
                 self.visit(node.else_block)
         self.memory_stack.pop()
