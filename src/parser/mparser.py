@@ -132,7 +132,7 @@ def p_expression_string(p):
 
 def p_expression_group(p):
     """expression : '(' expression  ')' """
-    p[0] = Expression(p.lexer.lineno, p[1])
+    p[0] = Expression(p.lexer.lineno, p[2])
 
 def p_create_matrix(p):
     """expression : ZEROS '(' value_list ')'

@@ -98,6 +98,8 @@ class TypeChecker(NodeVisitor):
             node.size = node.value_list.size
 
     def visit_ValueList(self, node: ValueList): # do not check type compatibility here - e.g. value lists do not have to have the same type
+        node.type = Type.VECTOR
+        node.size = len(node.values)
         self.generic_visit(node)
 
     def _check_list_types(self, node: ValueList):
@@ -143,8 +145,9 @@ class TypeChecker(NodeVisitor):
 
     def visit_MatrixCreator(self, node: MatrixCreator):
         self.visit(node.n)
+        print(node.n)
         node.type = Type.MATRIX
-        assert node.n.type == Type.VECTOR, "argument list should always be vector"
+        assert node.n.type == Type.VECTOR, f"argument list should always be vector, got {node.n.type}"
         if node.n.size == 1:
             arg = node.n.values[0]
             if arg.type == Type.INTNUM:
