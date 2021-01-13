@@ -6,7 +6,7 @@ from src.interpreter.interpreter import Interpreter
 if __name__ == '__main__':
     # -------from file
     try:
-        filename = sys.argv[1] if len(sys.argv) > 1 else "../../examples/matrix.txt"
+        filename = sys.argv[1] if len(sys.argv) > 1 else "../../examples/to_interpret/pi.txt"
         file = open(filename, "r")
     except IOError:
         print("Cannot open {0} file".format(filename))
@@ -16,7 +16,7 @@ if __name__ == '__main__':
     parser = mparser.parser
 
     ast = parser.parse(text)
-    ast.print_tree()
+    # ast.print_tree()
 
     typeChecker = TypeChecker()
     correct = typeChecker.check(ast, verbose=True)

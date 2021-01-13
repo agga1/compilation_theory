@@ -135,7 +135,6 @@ class Interpreter(object):
                 updated_id[refs[0], refs[1]] = new_val
             self.memory_stack.set(node.left.identifier.identifier, updated_id)
 
-
     @when(MatrixCreator)
     def visit(self, node: MatrixCreator):
         shape = self.visit(node.n)
