@@ -128,10 +128,11 @@ class Interpreter(object):
         elif isinstance(node.left, PartialId):
             updated_id = self.visit(node.left.identifier)
             refs = self.visit(node.left.index_ref)
+            print("refs:", refs)
             if len(refs) == 1:
                 updated_id[refs[0]] = new_val
             else:
-                updated_id[refs[0]][refs[1]] = new_val
+                updated_id[refs[0], refs[1]] = new_val
             self.memory_stack.set(node.left.identifier.identifier, updated_id)
 
 
