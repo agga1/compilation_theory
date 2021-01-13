@@ -117,10 +117,10 @@ class TypeChecker(NodeVisitor):
     def visit_Range(self, node: Range):
         self.visit(node.fr)
         self.visit(node.to)
+        node.type = Type.RANGE
         if node.fr.type != Type.INTNUM or node.to.type != Type.INTNUM:
             self.error(node.pos, f"range must be defined with integers, found {node.fr.type}, {node.to.type}")
-        else:
-            node.type = Type.VECTOR
+
 
     # operations --------------------------------------------------
     def visit_Assign(self, node: Assign):

@@ -8,6 +8,7 @@ class Type(Enum):
     VECTOR = auto()
     MATRIX = auto()
     BOOLEAN = auto()
+    RANGE = auto()
     NULL = auto()
     UNKNOWN = auto()
 

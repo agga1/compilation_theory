@@ -1,9 +1,12 @@
 x = 10;
-print x;
+print x, "hello";
 while( x < 16 ){
     print x;
     x += 1;
     if (x==13) continue;
     print "ha";
+}
+for i=1:10{
+ print i;
 }
 print x;

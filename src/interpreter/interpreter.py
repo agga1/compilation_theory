@@ -14,7 +14,7 @@ class Interpreter(object):
     def __init__(self):
         self.memory_stack = MemoryStack()
 
-    def generic_visit(self, node: Node): # todo how??
+    def generic_visit(self, node: Node):
         print("generic", node)
         for child in node.children:
             if child:
@@ -40,13 +40,12 @@ class Interpreter(object):
 
     @when(Empty)
     def visit(self, node: Empty):
-        print("Empty")
+        pass
 
     @when(Print)
     def visit(self, node: Print):
         vals = self.visit(node.value_list)
-        for val in vals:
-            print("[printing]: ",val)
+        print(*vals)
     # --------------------------------------------  expressions ---------------------------
 
     @when(Expression)
@@ -75,7 +74,6 @@ class Interpreter(object):
     @when(Identifier)
     def visit(self, node: Identifier):
         val = self.memory_stack.get(node.identifier)
-        # print(node.identifier, ":", val)
         return val
 
     @when(PartialId)
@@ -97,9 +95,8 @@ class Interpreter(object):
         return ref_list
 
     @when(Range)
-    def visit(self, node: Range): # todo check if working
+    def visit(self, node: Range):
         val = (self.visit(node.fr), self.visit(node.to))
-        print("range:", val)
         return val
 
     @when(List)
@@ -127,7 +124,6 @@ class Interpreter(object):
         right_val = self.visit(node.right)
         new_val = operations[node.op](old_val, right_val)
         if isinstance(node.left, Identifier):
-            print("assigning", node.left.identifier, "to", new_val)
             self.memory_stack.set(node.left.identifier, new_val)
         elif isinstance(node.left, PartialId):
             updated_id = self.visit(node.left.identifier)
@@ -136,7 +132,6 @@ class Interpreter(object):
                 updated_id[refs[0]] = new_val
             else:
                 updated_id[refs[0]][refs[1]] = new_val
-            print("assigning", node.left.identifier.identifier, "to", updated_id)
             self.memory_stack.set(node.left.identifier.identifier, updated_id)
 
 

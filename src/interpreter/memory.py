@@ -1,10 +1,5 @@
+from src.interpreter.operators import operations
 from src.type_check.SymbolTable import Symbol
-
-
-class SymbolAssigned(Symbol):
-    def __init__(self, value, name, mtype, size):
-        super().__init__(name, mtype, size)
-        self.value = value
 
 
 class Memory:
